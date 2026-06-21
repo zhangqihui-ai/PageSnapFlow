@@ -1,0 +1,266 @@
+# Reusable ADB capture profiles for TapTap tabs.
+# Referenced from config/taptap_tabs.yaml via `profile: <name>`
+
+profiles:
+  feed_scroll:
+    strategy: scroll
+    # Uses global scroll_swipes from taptap_tabs.yaml (~121 shots/segment)
+
+  # 排行榜专用：每榜约 top150（~8 条/屏 → 约 20 次下滑），列表行样式相似，放宽重复判定
+  ranking_scroll:
+    strategy: scroll
+    scroll_swipes: 40
+    capture:
+      scroll_stop_after_dupes: 15
+      duplicate_threshold: 0.98
+
+  # 排行榜：先滚完榜单列表，再点进 sample 游戏深截详情页各子 tab
+  ranking_list_detail:
+    strategy: hybrid
+    capture:
+      navigation_delay_ms: 550
+      steps:
+        - { type: capture, name: overview }
+        - type: scroll_limited
+          name: rank_list
+          max_swipes: 25
+          capture:
+            scroll_stop_after_dupes: 4
+            duplicate_threshold: 0.98
+        - { type: scroll_to_top, name: back_to_top, repeat: 18, wait_ms: 120 }
+        - { type: retap_top, name: refocus_tab, wait_ms: 400 }
+        - type: drill_down
+          name: sample_games
+          game_detail_profile: game_detail_deep
+          after_back_settle_ms: 500
+          entries:
+            - { label: g1, point: "50%, 28%", list_scroll: 0 }
+            - { label: g2, point: "50%, 32%", list_scroll: 5 }
+            - { label: g3, point: "50%, 32%", list_scroll: 10 }
+
+  # 游戏详情：自动识别 6-tab 或 3-tab(详情/评价/论坛)，各 tab 少量滚动后左上角返回
+  game_detail_deep:
+    capture:
+      navigation_delay_ms: 400
+      scroll_stop_after_dupes: 3
+      duplicate_threshold: 0.97
+      probe_point: "20%, 13%"
+      probe_threshold: 0.94
+      detail_tab_point: "38%, 13%"
+      forum_nested_tab: "8%, 18%"
+      forum_nested_guides: "22%, 18%"
+      forum_nested_official: "36%, 18%"
+      forum_nested_max_swipes: 12
+      forum_nested_scroll_stop_after_dupes: 3
+      forum_transition_threshold: 0.88
+      forum_nested_max_backs: 2
+      back: "6%, 13%"
+      after_back_ms: 500
+    landing:
+      name: detail
+      text: "详情"
+      detail_point: "38%, 13%"
+      max_swipes: 8
+    layouts:
+      full:
+        - { name: stats, text: "统计", point: "20%, 13%", max_swipes: 5 }
+        - { name: new_ver, text: "新版本", point: "32%, 13%", max_swipes: 5, optional: true }
+        - { name: reviews, text: "评价", point: "56%, 13%", max_swipes: 8 }
+        - { name: guides, text: "攻略", point: "68%, 13%", max_swipes: 5 }
+        - { name: forum, text: "论坛", point: "80%, 13%", max_swipes: 5, forum_nested: true }
+      minimal:
+        - { name: reviews, text: "评价", point: "50%, 13%", max_swipes: 8 }
+        - { name: forum, text: "论坛", point: "68%, 13%", max_swipes: 5, forum_nested: true }
+
+  hybrid_today:
+    strategy: hybrid
+    capture:
+      navigation_delay_ms: 500
+      steps:
+        - { type: capture, name: overview }
+        - type: horizontal
+          name: date_strip
+          name_prefix: date
+          count: 7
+          wait_ms: 250
+          swipe: { start: "78%, 18%", end: "22%, 18%", duration: 280 }
+          reset_swipe: { start: "22%, 18%", end: "78%, 18%", duration: 350 }
+        - { type: tap_scroll, name: expand_collapsed, point: "70%, 78%", wait_ms: 400, scroll_swipes: 5 }
+        - type: drill_down
+          name: game_cards
+          entries:
+            - { label: hero, point: "50%, 34%", scroll_swipes: 6 }
+            - { label: left_banner, point: "28%, 50%", scroll_swipes: 5 }
+            - { label: right_banner, point: "72%, 50%", scroll_swipes: 5 }
+            - { label: row2_left, point: "28%, 62%", scroll_swipes: 4 }
+            - { label: row2_right, point: "72%, 62%", scroll_swipes: 4 }
+            - { label: row3_left, point: "28%, 74%", scroll_swipes: 3 }
+
+  hybrid_card_feed:
+    strategy: hybrid
+    capture:
+      navigation_delay_ms: 450
+      steps:
+        - { type: capture, name: overview }
+        - { type: scroll_limited, name: feed, max_swipes: 40 }
+        - type: drill_down
+          name: cards
+          entries:
+            - { label: card1, point: "50%, 30%", scroll_swipes: 5 }
+            - { label: card2, point: "50%, 45%", scroll_swipes: 5 }
+            - { label: card3, point: "50%, 58%", scroll_swipes: 4 }
+            - { label: card4, point: "50%, 70%", scroll_swipes: 4 }
+            - { label: card5, point: "28%, 52%", scroll_swipes: 4 }
+            - { label: card6, point: "72%, 52%", scroll_swipes: 4 }
+
+  hybrid_category:
+    strategy: hybrid
+    capture:
+      navigation_delay_ms: 500
+      steps:
+        - { type: capture, name: overview }
+        - type: horizontal
+          name: cat_row
+          name_prefix: cat_tab
+          count: 4
+          wait_ms: 200
+          swipe: { start: "80%, 20%", end: "20%, 20%", duration: 260 }
+          reset_swipe: { start: "20%, 20%", end: "80%, 20%", duration: 320 }
+        - type: drill_down
+          name: categories
+          entries:
+            - { label: c1, point: "18%, 32%", scroll_swipes: 5 }
+            - { label: c2, point: "50%, 32%", scroll_swipes: 5 }
+            - { label: c3, point: "82%, 32%", scroll_swipes: 5 }
+            - { label: c4, point: "18%, 48%", scroll_swipes: 5 }
+            - { label: c5, point: "50%, 48%", scroll_swipes: 5 }
+            - { label: c6, point: "82%, 48%", scroll_swipes: 5 }
+            - { label: c7, point: "18%, 64%", scroll_swipes: 4 }
+            - { label: c8, point: "50%, 64%", scroll_swipes: 4 }
+
+  hybrid_community:
+    strategy: hybrid
+    capture:
+      navigation_delay_ms: 450
+      steps:
+        - { type: capture, name: overview }
+        - { type: scroll_limited, name: feed, max_swipes: 40 }
+        - type: drill_down
+          name: posts
+          entries:
+            - { label: post1, point: "50%, 32%", scroll_swipes: 5 }
+            - { label: post2, point: "50%, 48%", scroll_swipes: 5 }
+            - { label: post3, point: "50%, 62%", scroll_swipes: 4 }
+            - { label: post4, point: "50%, 76%", scroll_swipes: 4 }
+
+  # 社区：发现 / 热榜 / 论坛 — 长滚列表 + 回顶后点进话题深滚 + 左上角返回
+  community_feed:
+    strategy: hybrid
+    capture:
+      navigation_delay_ms: 450
+      steps:
+        - { type: capture, name: overview }
+        - type: scroll_limited
+          name: feed
+          max_swipes: 90
+          capture:
+            scroll_stop_after_dupes: 6
+            duplicate_threshold: 0.97
+        - { type: scroll_to_top, name: back_to_top, repeat: 22, wait_ms: 120 }
+        - { type: retap_top, name: refocus_tab, wait_ms: 400 }
+        - type: drill_down
+          name: topics
+          pre_scroll_between: 6
+          after_back_settle_ms: 500
+          scroll_stop_after_dupes: 4
+          back_max_attempts: 3
+          entries:
+            - { label: t1, point: "50%, 34%", scroll_swipes: 30 }
+            - { label: t2, point: "50%, 46%", scroll_swipes: 30, list_scroll: 6 }
+            - { label: t3, point: "50%, 58%", scroll_swipes: 30, list_scroll: 6 }
+
+  hybrid_forum:
+    strategy: hybrid
+    capture:
+      navigation_delay_ms: 450
+      steps:
+        - { type: capture, name: overview }
+        - { type: scroll_limited, name: forum_list, max_swipes: 35 }
+        - type: drill_down
+          name: threads
+          entries:
+            - { label: t1, point: "50%, 30%", scroll_swipes: 5 }
+            - { label: t2, point: "50%, 42%", scroll_swipes: 5 }
+            - { label: t3, point: "50%, 54%", scroll_swipes: 4 }
+            - { label: t4, point: "50%, 66%", scroll_swipes: 4 }
+            - { label: t5, point: "50%, 78%", scroll_swipes: 4 }
+
+  hybrid_messages:
+    strategy: hybrid
+    capture:
+      navigation_delay_ms: 400
+      steps:
+        - { type: capture, name: overview }
+        - { type: scroll_limited, name: inbox, max_swipes: 20 }
+        - type: drill_down
+          name: messages
+          entries:
+            - { label: m1, point: "50%, 28%", scroll_swipes: 4 }
+            - { label: m2, point: "50%, 40%", scroll_swipes: 4 }
+            - { label: m3, point: "50%, 52%", scroll_swipes: 3 }
+            - { label: m4, point: "50%, 64%", scroll_swipes: 3 }
+            - { label: m5, point: "50%, 76%", scroll_swipes: 3 }
+
+  hybrid_my_games:
+    strategy: hybrid
+    capture:
+      navigation_delay_ms: 450
+      steps:
+        - { type: capture, name: overview }
+        - { type: scroll_limited, name: library, max_swipes: 35 }
+        - type: drill_down
+          name: games
+          entries:
+            - { label: g1, point: "50%, 32%", scroll_swipes: 5 }
+            - { label: g2, point: "50%, 46%", scroll_swipes: 5 }
+            - { label: g3, point: "50%, 60%", scroll_swipes: 4 }
+            - { label: g4, point: "50%, 74%", scroll_swipes: 4 }
+
+  hybrid_explore:
+    strategy: hybrid
+    capture:
+      navigation_delay_ms: 400
+      steps:
+        - { type: capture, name: overview }
+        - { type: scroll_limited, name: feed, max_swipes: 45 }
+        - type: drill_down
+          name: items
+          entries:
+            - { label: item1, point: "50%, 35%", scroll_swipes: 5 }
+            - { label: item2, point: "50%, 55%", scroll_swipes: 4 }
+            - { label: item3, point: "50%, 72%", scroll_swipes: 4 }
+
+  # 消息 / 我的游戏等轻量页：内容少、不可长滚、不宜点进详情
+  light_tab:
+    strategy: hybrid
+    capture:
+      steps:
+        - { type: capture, name: overview }
+        - { type: scroll_limited, name: feed, max_swipes: 8 }
+
+# Rough expected saved shots (after skip_duplicate_saves) for planning
+profile_estimates:
+  feed_scroll: 151
+  ranking_scroll: 38
+  ranking_list_detail: 140
+  game_detail_deep: 0
+  hybrid_today: 55
+  hybrid_card_feed: 75
+  hybrid_category: 75
+  hybrid_community: 60
+  hybrid_forum: 65
+  community_feed: 130
+  hybrid_messages: 45
+  hybrid_my_games: 55
+  hybrid_explore: 50
+  light_tab: 6

@@ -1,0 +1,8 @@
+# Wait until TapTap is in foreground (user opens manually).
+
+appId: com.taptap
+
+---
+- extendedWaitUntil:
+    visible: "找游戏"
+    timeout: 120000

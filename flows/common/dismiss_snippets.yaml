@@ -1,0 +1,42 @@
+# Reference snippets for Maestro 2.x inline subflows.
+# Maestro requires appId in standalone flow files; use inline runFlow.commands instead.
+
+permissions:
+  - tapOn:
+      text: "Allow"
+      optional: true
+  - tapOn:
+      text: "允许"
+      optional: true
+  - tapOn:
+      text: "While using the app"
+      optional: true
+  - tapOn:
+      text: "Only this time"
+      optional: true
+  - tapOn:
+      text: "在使用应用期间"
+      optional: true
+
+dialogs:
+  - tapOn:
+      text: "Skip"
+      optional: true
+  - tapOn:
+      text: "跳过"
+      optional: true
+  - tapOn:
+      text: "Close"
+      optional: true
+  - tapOn:
+      text: "关闭"
+      optional: true
+  - tapOn:
+      text: "Not now"
+      optional: true
+  - tapOn:
+      text: "Later"
+      optional: true
+  - tapOn:
+      text: "以后再说"
+      optional: true

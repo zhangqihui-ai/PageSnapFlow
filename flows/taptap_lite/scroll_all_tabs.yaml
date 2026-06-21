@@ -1,0 +1,1611 @@
+# AUTO-GENERATED — do not edit by hand.
+# Source: D:/code/zqh/PageSnapFlow/config/taptap_tabs.yaml
+# Regenerate: python scripts/generate_taptap_scroll_flow.py
+# Segments: scroll_swipes=150 (+1 start => 151 shots each)
+# Planned segments: 58, ~8758 screenshots (151 per segment)
+
+appId: com.taptap
+
+---
+- runFlow: ../common/ensure_taptap_ready.yaml
+
+- runFlow:
+    label: Dismiss dialogs if shown
+    commands:
+      - tapOn: { text: "允许", optional: true }
+      - tapOn: { text: "跳过", optional: true }
+      - tapOn: { text: "关闭", optional: true }
+      - tapOn: { text: "以后再说", optional: true }
+
+# --- Bottom: find_games (b01) ---
+- tapOn:
+    point: "10%, 96%"
+- waitForAnimationToEnd:
+    timeout: 300
+
+# Segment 1: find_games / recommend
+- tapOn: { text: "推荐" }
+- tapOn: { point: "8%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b01_t01"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 2: find_games / today
+- tapOn: { text: "今日游戏" }
+- tapOn: { point: "22%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b01_t02"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 3: find_games / tap_make
+- tapOn: { text: "Tap 制造" }
+- tapOn: { point: "36%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b01_t03"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 4: find_games / category
+- tapOn: { text: "游戏分类" }
+- tapOn: { point: "50%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b01_t04"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 5: find_games / pc
+- tapOn: { text: "PC游戏" }
+- tapOn: { point: "65%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b01_t05"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 6: find_games / share_wall
+- tapOn: { text: "安利墙" }
+- tapOn: { point: "80%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b01_t06"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 7: find_games / indie
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { text: "独立游戏" }
+- tapOn: { point: "72%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b01_t07"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 8: find_games / new_preview
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { text: "新游预告" }
+- tapOn: { point: "58%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b01_t08"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 9: find_games / cloud
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { text: "云游戏" }
+- tapOn: { point: "44%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b01_t09"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 10: find_games / activity
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { text: "活动" }
+- tapOn: { point: "30%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b01_t10"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 11: find_games / find_more_1
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { point: "88%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b01_t11"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 12: find_games / find_more_2
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { point: "75%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b01_t12"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 13: find_games / find_more_3
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { point: "62%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b01_t13"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 14: find_games / find_more_4
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { point: "48%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b01_t14"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# --- Bottom: ranking (b02) ---
+- tapOn:
+    point: "30%, 96%"
+- waitForAnimationToEnd:
+    timeout: 300
+
+# Segment 15: ranking / hot
+- tapOn: { text: "热门榜" }
+- tapOn: { point: "8%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b02_t01"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 16: ranking / reserve
+- tapOn: { text: "预约榜" }
+- tapOn: { point: "22%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b02_t02"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 17: ranking / playing
+- tapOn: { text: "热玩榜" }
+- tapOn: { point: "36%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b02_t03"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 18: ranking / new
+- tapOn: { text: "新品榜" }
+- tapOn: { point: "50%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b02_t04"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 19: ranking / sell
+- tapOn: { text: "畅销榜" }
+- tapOn: { point: "65%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b02_t05"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 20: ranking / score
+- tapOn: { text: "口碑榜" }
+- tapOn: { point: "80%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b02_t06"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 21: ranking / download
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { text: "下载榜" }
+- tapOn: { point: "72%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b02_t07"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 22: ranking / update
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { text: "更新榜" }
+- tapOn: { point: "58%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b02_t08"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 23: ranking / rank_tab_9
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { text: "飙升榜" }
+- tapOn: { point: "88%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b02_t09"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 24: ranking / rank_tab_10
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { point: "75%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b02_t10"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 25: ranking / rank_tab_11
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { point: "62%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b02_t11"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 26: ranking / rank_tab_12
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { point: "48%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b02_t12"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 27: ranking / rank_tab_13
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { point: "35%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b02_t13"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 28: ranking / rank_tab_14
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { point: "22%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b02_t14"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# --- Bottom: community (b03) ---
+- tapOn:
+    point: "50%, 96%"
+- waitForAnimationToEnd:
+    timeout: 300
+
+# Segment 29: community / follow
+- tapOn: { text: "关注" }
+- tapOn: { point: "8%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b03_t01"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 30: community / discover
+- tapOn: { text: "发现" }
+- tapOn: { point: "22%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b03_t02"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 31: community / hot
+- tapOn: { text: "热榜" }
+- tapOn: { point: "36%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b03_t03"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 32: community / forum
+- tapOn: { text: "论坛" }
+- tapOn: { point: "50%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b03_t04"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 33: community / video
+- tapOn: { text: "视频" }
+- tapOn: { point: "65%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b03_t05"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 34: community / topic
+- tapOn: { text: "话题" }
+- tapOn: { point: "80%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b03_t06"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 35: community / comm_tab_7
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { point: "88%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b03_t07"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 36: community / comm_tab_8
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { point: "72%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b03_t08"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 37: community / comm_tab_9
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { point: "58%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b03_t09"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 38: community / comm_tab_10
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { point: "44%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b03_t10"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 39: community / comm_tab_11
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { point: "30%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b03_t11"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 40: community / comm_tab_12
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { point: "88%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b03_t12"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# --- Bottom: messages (b04) ---
+- tapOn:
+    point: "70%, 96%"
+- waitForAnimationToEnd:
+    timeout: 300
+
+# Segment 41: messages / inbox
+- tapOn: { point: "50%, 25%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b04_t01"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 42: messages / notify
+- tapOn: { text: "通知" }
+- tapOn: { point: "25%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b04_t02"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 43: messages / chat
+- tapOn: { text: "私信" }
+- tapOn: { point: "45%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b04_t03"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 44: messages / system
+- tapOn: { text: "系统" }
+- tapOn: { point: "65%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b04_t04"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 45: messages / msg_tab_5
+- tapOn: { point: "80%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b04_t05"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 46: messages / msg_tab_6
+- tapOn: { point: "50%, 25%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b04_t06"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# --- Bottom: my_games (b05) ---
+- tapOn:
+    point: "90%, 96%"
+- waitForAnimationToEnd:
+    timeout: 300
+
+# Segment 47: my_games / local
+- tapOn: { text: "本机" }
+- tapOn: { point: "8%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b05_t01"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 48: my_games / cloud_play
+- tapOn: { text: "云玩" }
+- tapOn: { point: "22%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b05_t02"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 49: my_games / reserve
+- tapOn: { text: "预约" }
+- tapOn: { point: "36%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b05_t03"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 50: my_games / wish
+- tapOn: { text: "心愿单" }
+- tapOn: { point: "50%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b05_t04"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 51: my_games / history
+- tapOn: { text: "历史" }
+- tapOn: { point: "65%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b05_t05"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 52: my_games / update_mgr
+- tapOn: { text: "更新" }
+- tapOn: { point: "80%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b05_t06"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+# Segment 53: my_games / my_tab_7
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { point: "88%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b05_t07"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 54: my_games / my_tab_8
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { point: "72%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b05_t08"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 55: my_games / my_tab_9
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { point: "58%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b05_t09"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 56: my_games / my_tab_10
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { point: "44%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b05_t10"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 57: my_games / my_tab_11
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { point: "30%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b05_t11"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+
+# Segment 58: my_games / my_tab_12
+- swipe:
+    start: 82%, 12%
+    end: 18%, 12%
+    duration: 280
+- tapOn: { point: "88%, 12%" }
+- waitForAnimationToEnd:
+    timeout: 250
+
+- evalScript: ${output.prefix = "b05_t12"}
+- evalScript: ${output.n = 0}
+- swipe:
+    start: 50%, 38%
+    end: 50%, 68%
+    duration: 200
+- takeScreenshot: ${output.prefix + "_00_start"}
+- repeat:
+    times: 150
+    commands:
+      - swipe:
+          start: 50%, 58%
+          end: 50%, 32%
+          duration: 200
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${output.prefix + "_" + output.n}
+
+- swipe:
+    start: 18%, 12%
+    end: 82%, 12%
+    duration: 280
+

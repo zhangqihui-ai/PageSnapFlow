@@ -1,0 +1,4 @@
+# Maestro workspace configuration
+# https://docs.maestro.dev/reference/workspace-configuration
+
+testOutputDir: screenshots

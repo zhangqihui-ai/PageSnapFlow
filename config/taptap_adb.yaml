@@ -1,0 +1,29 @@
+# ADB direct capture profiles (used by scripts/adb_taptap_capture.py)
+# Maestro flow name -> which tab segments to run
+
+flow_profiles:
+  scroll_bottom1_top1:
+    segments: [b01_t01]
+    prefix_map:
+      b01_t01: b1t1
+  scroll_bottom1_top1_fast:
+    segments: [b01_t01]
+    prefix_map:
+      b01_t01: b1t1
+  scroll_all_tabs:
+    segments: all
+
+  scroll_today_games_pilot:
+    segments: [b01_t02]
+    prefix_map:
+      b01_t02: b01_t02
+
+# ADB timing (no UI settle; optional minimal delays)
+adb_capture:
+  tap_delay_ms: 150
+  post_swipe_delay_ms: 0
+  duplicate_threshold: 0.95
+  skip_duplicate_saves: true
+
+capture_defaults:
+  scroll_stop_after_dupes: 3

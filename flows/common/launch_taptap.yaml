@@ -1,0 +1,31 @@
+appId: com.taptap
+
+---
+- stopApp
+
+- launchApp:
+    clearState: false
+
+- waitForAnimationToEnd:
+    timeout: 3000
+
+- runFlow:
+    when:
+      notVisible: "找游戏"
+    commands:
+      - tapOn:
+          text: "TapTap"
+          optional: true
+      - tapOn:
+          text: "Tap"
+          optional: true
+      - waitForAnimationToEnd:
+          timeout: 2000
+      - launchApp:
+          clearState: false
+      - waitForAnimationToEnd:
+          timeout: 3000
+
+- extendedWaitUntil:
+    visible: "找游戏"
+    timeout: 45000

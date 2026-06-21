@@ -1,0 +1,11 @@
+# Device configuration
+# List connected devices: adb devices
+
+default_device: null  # null = first available device
+
+devices: []
+# Example:
+#   - id: emulator-5554
+#     name: Pixel_6_API_34
+#     width: 1080
+#     height: 2400

@@ -1,0 +1,35 @@
+# Template flow - copy to flows/<app_name>/ and customize
+# 1. Set appId (adb shell pm list packages | findstr -i <keyword>)
+# 2. Record selectors with: maestro studio
+# 3. Add takeScreenshot after each action
+
+appId: com.example.app
+
+---
+- launchApp
+- runFlow:
+    label: Dismiss permissions
+    commands:
+      - tapOn: { text: "Allow", optional: true }
+      - tapOn: { text: "允许", optional: true }
+- runFlow:
+    label: Dismiss dialogs
+    commands:
+      - tapOn: { text: "Skip", optional: true }
+      - tapOn: { text: "跳过", optional: true }
+      - tapOn: { text: "Close", optional: true }
+      - tapOn: { text: "关闭", optional: true }
+- takeScreenshot: 01_home
+
+- swipe:
+    start: 50%, 80%
+    end: 50%, 20%
+- takeScreenshot: 02_after_swipe
+
+- tapOn:
+    text: "TabName"
+    optional: true
+- takeScreenshot: 03_tab
+
+- back
+- takeScreenshot: 04_back

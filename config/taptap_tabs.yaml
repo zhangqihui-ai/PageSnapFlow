@@ -1,0 +1,129 @@
+# TapTap tab map — ADB capture + Maestro flow generation
+# Regenerate Maestro flow: python scripts/generate_taptap_scroll_flow.py
+# Estimate ADB volume: python scripts/estimate_capture_plan.py
+# Navigation plan (human): docs/taptap_capture_plan.md
+# Print checklist: python scripts/print_taptap_capture_plan.py
+#
+# === 执行顺序（固定）===
+#   重点: b01 找游戏(14) + b02 排行榜(14) + b03 社区(3)  — 内容多，全量截
+#   轻量: b04 消息(4) + b05 我的游戏(6)                  — 内容少，仅 overview + 短滚
+#
+#   b01(14) → b02(14) → b03(3) → b04(4) → b05(6)  = 41 段
+#
+# === 每段导航 ===
+#   1. 底部 tab 变化时才点底部（10%/30%/50%/70%/90% @ 96%）
+#   2. top_bar_swipe: left=左滑1次, left2=左滑2次（露出隐藏顶栏 tab）
+#   3. 点顶栏子 tab
+#   4. 按 profile 截图（见 taptap_capture_profiles.yaml）
+#   5. 段末顶栏复位（若曾左滑）
+#
+# === profile 模式 ===
+#   ranking_scroll   → A' 排行榜下滑（每榜~top150，最多40屏，放宽重复判定）
+#   hybrid_today     → C 横滑日期 + 点卡片详情 + BACK
+#   hybrid_category  → D 横滑分类 + 点格子详情 + BACK
+#   hybrid_* 其他    → B 有限下滑 + 点进详情滚动 + BACK
+#   light_tab        → E 轻量页（overview + 最多 8 屏下滑，不点进详情）
+
+scroll_swipes: 150          # scroll strategy: +1 overview => 151 shots/segment
+target_total_min: 5000
+target_total_max: 6000
+
+bottom_tabs:
+  - id: b01
+    label: find_games
+    point: "10%, 96%"
+    top_tabs:
+      - { id: t01, label: recommend, text: "推荐", point: "8%, 12%", profile: feed_scroll }
+      - { id: t02, label: today, text: "今日游戏", point: "22%, 12%", profile: hybrid_today }
+      - { id: t03, label: tap_make, text: "Tap 制造", point: "36%, 12%", profile: hybrid_card_feed }
+      - { id: t04, label: category, text: "游戏分类", point: "50%, 12%", profile: hybrid_category }
+      - { id: t05, label: pc, text: "PC游戏", point: "65%, 12%", profile: feed_scroll }
+      - { id: t06, label: share_wall, text: "安利墙", point: "80%, 12%", profile: feed_scroll }
+      - { id: t07, label: indie, text: "独立游戏", point: "72%, 12%", top_bar_swipe: left, profile: hybrid_card_feed }
+      - { id: t08, label: new_preview, text: "新游预告", point: "58%, 12%", top_bar_swipe: left, profile: hybrid_today }
+      - { id: t09, label: cloud, text: "云游戏", point: "44%, 12%", top_bar_swipe: left, profile: hybrid_card_feed }
+      - { id: t10, label: activity, text: "活动", point: "30%, 12%", top_bar_swipe: left, profile: hybrid_card_feed }
+      - { id: t11, label: find_more_1, point: "88%, 12%", top_bar_swipe: left, profile: hybrid_explore }
+      - { id: t12, label: find_more_2, point: "75%, 12%", top_bar_swipe: left2, profile: hybrid_explore }
+      - { id: t13, label: find_more_3, point: "62%, 12%", top_bar_swipe: left2, profile: hybrid_explore }
+      - { id: t14, label: find_more_4, point: "48%, 12%", top_bar_swipe: left2, profile: hybrid_explore }
+
+  - id: b02
+    label: ranking
+    point: "30%, 96%"
+    top_tabs:
+      - { id: t01, label: hot, text: "热门榜", point: "8%, 12%", profile: ranking_list_detail }
+      - { id: t02, label: reserve, text: "预约榜", point: "22%, 12%", profile: ranking_list_detail }
+      - { id: t03, label: playing, text: "热玩榜", point: "36%, 12%", profile: ranking_list_detail }
+      - { id: t04, label: new, text: "新品榜", point: "50%, 12%", profile: ranking_list_detail }
+      - { id: t05, label: sell, text: "热卖榜", point: "65%, 12%", profile: ranking_list_detail }
+      - { id: t06, label: score, text: "口碑榜", point: "80%, 12%", profile: ranking_list_detail }
+      - { id: t07, label: download, text: "下载榜", point: "72%, 12%", top_bar_swipe: left, profile: ranking_list_detail }
+      - { id: t08, label: update, text: "更新榜", point: "58%, 12%", top_bar_swipe: left, profile: ranking_list_detail }
+      - { id: t09, label: rank_tab_9, text: "飙升榜", point: "88%, 12%", top_bar_swipe: left, profile: ranking_list_detail }
+      - { id: t10, label: rank_tab_10, point: "75%, 12%", top_bar_swipe: left2, profile: hybrid_card_feed }
+      - { id: t11, label: rank_tab_11, point: "62%, 12%", top_bar_swipe: left2, profile: hybrid_card_feed }
+      - { id: t12, label: rank_tab_12, point: "48%, 12%", top_bar_swipe: left2, profile: hybrid_card_feed }
+      - { id: t13, label: rank_tab_13, point: "35%, 12%", top_bar_swipe: left2, profile: hybrid_explore }
+      - { id: t14, label: rank_tab_14, point: "22%, 12%", top_bar_swipe: left2, profile: hybrid_explore }
+
+  - id: b03
+    label: community
+    point: "50%, 96%"
+    top_tabs:
+      - { id: t02, label: discover, text: "发现", point: "22%, 12%", profile: community_feed }
+      - { id: t03, label: hot, text: "热榜", point: "36%, 12%", profile: community_feed }
+      - { id: t04, label: forum, text: "论坛", point: "50%, 12%", profile: community_feed }
+
+  - id: b04
+    label: messages
+    point: "70%, 96%"
+    top_tabs:
+      - { id: t01, label: inbox, text: "消息首页", point: "50%, 25%", profile: light_tab }
+      - { id: t02, label: notify, text: "通知", point: "25%, 12%", profile: light_tab }
+      - { id: t03, label: chat, text: "私信", point: "45%, 12%", profile: light_tab }
+      - { id: t04, label: system, text: "系统", point: "65%, 12%", profile: light_tab }
+
+  - id: b05
+    label: my_games
+    point: "90%, 96%"
+    top_tabs:
+      - { id: t01, label: local, text: "本机", point: "8%, 12%", profile: light_tab }
+      - { id: t02, label: cloud_play, text: "云玩", point: "22%, 12%", profile: light_tab }
+      - { id: t03, label: reserve, text: "预约", point: "36%, 12%", profile: light_tab }
+      - { id: t04, label: wish, text: "心愿单", point: "50%, 12%", profile: light_tab }
+      - { id: t05, label: history, text: "历史", point: "65%, 12%", profile: light_tab }
+      - { id: t06, label: update_mgr, text: "更新", point: "80%, 12%", profile: light_tab }
+
+# === 滑动安全区 ===
+#   所有 feed 下滑 / scroll_to_top 仅在 y=26%~46% 区域，避免误触底部 tab 栏（~96%）
+
+top_bar_swipes:
+  left:
+    start: "82%, 12%"
+    end: "18%, 12%"
+    duration: 280
+  left2:
+    start: "82%, 12%"
+    end: "18%, 12%"
+    duration: 280
+  reset:
+    start: "18%, 12%"
+    end: "82%, 12%"
+    duration: 280
+
+# 列表下滑 — 只在屏幕中上部滑动（y 24%~42%），远离底部 tab 栏 ~96%
+feed_swipe:
+  start: "50%, 42%"
+  end: "50%, 24%"
+  duration: 240
+
+# 滑回顶部 — 手指下移，内容回顶；可 repeat 多次（榜单从150回顶）
+scroll_to_top:
+  start: "50%, 28%"
+  end: "50%, 40%"
+  duration: 240
+
+# 游戏详情页左上角返回（系统 BACK 键通常无效）
+ui_points:
+  back: "6%, 13%"

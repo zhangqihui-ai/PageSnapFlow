@@ -1,0 +1,53 @@
+# App registry for PageSnapFlow
+# Verify package names on device: adb shell pm list packages | findstr -i <keyword>
+
+apps:
+  breaking_news_us:
+    display_name: Breaking News US
+    package: com.breakingnews.us
+    flows:
+      - home_browse
+
+  taptap_lite:
+    display_name: TapTap
+    package: com.taptap
+    flows:
+      - home_browse
+      - scroll_bottom1_top1
+      - scroll_bottom1_top1_fast
+      - scroll_all_tabs
+    adb_flows:
+      - scroll_bottom1_top1
+      - scroll_bottom1_top1_fast
+      - scroll_all_tabs
+      - scroll_today_games_pilot
+
+  mcdonalds:
+    display_name: McDonald's
+    package: com.mcdonalds.mobileapp
+    flows:
+      - home_browse
+
+  booking:
+    display_name: Booking.com
+    package: com.booking
+    flows:
+      - home_browse
+
+  zcool:
+    display_name: 站酷
+    package: com.zcool.community
+    flows:
+      - home_browse
+
+  playstation:
+    display_name: PlayStation App
+    package: com.scee.psxandroid
+    flows:
+      - home_browse
+
+  youtube_tv:
+    display_name: YouTube TV
+    package: com.google.android.apps.youtube.unplugged
+    flows:
+      - home_browse

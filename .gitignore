@@ -1,0 +1,22 @@
+# Maestro / runtime artifacts
+.maestro/*
+!.maestro/config.yaml
+screenshots/
+filtered/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+
+# Local tools (optional install location)
+tools/maestro/
+tools/platform-tools/

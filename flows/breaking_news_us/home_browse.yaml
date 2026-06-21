@@ -1,0 +1,48 @@
+# Breaking News US - home feed browse with screenshots
+# Package: verify with  adb shell pm list packages | findstr -i breaking
+
+appId: com.breakingnews.us
+
+---
+- launchApp
+- runFlow:
+    label: Dismiss permissions
+    commands:
+      - tapOn: { text: "Allow", optional: true }
+      - tapOn: { text: "允许", optional: true }
+- runFlow:
+    label: Dismiss dialogs
+    commands:
+      - tapOn: { text: "Skip", optional: true }
+      - tapOn: { text: "跳过", optional: true }
+      - tapOn: { text: "Close", optional: true }
+      - tapOn: { text: "关闭", optional: true }
+- takeScreenshot: 01_home
+
+- swipe:
+    start: 50%, 75%
+    end: 50%, 25%
+- takeScreenshot: 02_feed_swipe_1
+
+- swipe:
+    start: 50%, 75%
+    end: 50%, 25%
+- takeScreenshot: 03_feed_swipe_2
+
+- tapOn:
+    point: 50%, 35%
+    optional: true
+- takeScreenshot: 04_article_detail
+
+- back
+- takeScreenshot: 05_back_to_feed
+
+- tapOn:
+    text: "Trending"
+    optional: true
+- takeScreenshot: 06_trending_tab
+
+- tapOn:
+    text: "Local"
+    optional: true
+- takeScreenshot: 07_local_tab

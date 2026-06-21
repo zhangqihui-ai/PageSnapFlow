@@ -1,0 +1,59 @@
+appId: com.taptap
+
+---
+- runFlow: ../common/ensure_taptap_ready.yaml
+
+- runFlow:
+    label: Dismiss dialogs if shown
+    commands:
+      - tapOn:
+          text: "允许"
+          optional: true
+      - tapOn:
+          text: "跳过"
+          optional: true
+      - tapOn:
+          text: "关闭"
+          optional: true
+      - tapOn:
+          text: "以后再说"
+          optional: true
+      - tapOn:
+          text: "同意"
+          optional: true
+
+- takeScreenshot: 01_launch
+
+- tapOn:
+    point: "10%, 96%"
+- takeScreenshot: 02_find_games
+
+- swipe:
+    start: 50%, 75%
+    end: 50%, 35%
+- takeScreenshot: 03_swipe_1
+
+- swipe:
+    start: 50%, 75%
+    end: 50%, 35%
+- takeScreenshot: 04_swipe_2
+
+- tapOn:
+    point: "30%, 96%"
+- takeScreenshot: 05_ranking
+
+- tapOn:
+    point: "50%, 96%"
+- takeScreenshot: 06_community
+
+- tapOn:
+    point: "70%, 96%"
+- takeScreenshot: 07_messages
+
+- tapOn:
+    point: "90%, 96%"
+- takeScreenshot: 08_my_games
+
+- tapOn:
+    point: "10%, 96%"
+- takeScreenshot: 09_back_find_games

@@ -1,0 +1,54 @@
+# McDonald's - menu browse
+# Package: adb shell pm list packages | findstr -i mcdonalds
+
+appId: com.mcdonalds.mobileapp
+
+---
+- launchApp
+- runFlow:
+    label: Dismiss permissions
+    commands:
+      - tapOn: { text: "Allow", optional: true }
+      - tapOn: { text: "允许", optional: true }
+- runFlow:
+    label: Dismiss dialogs
+    commands:
+      - tapOn: { text: "Skip", optional: true }
+      - tapOn: { text: "跳过", optional: true }
+      - tapOn: { text: "Close", optional: true }
+      - tapOn: { text: "关闭", optional: true }
+- takeScreenshot: 01_home
+
+- tapOn:
+    text: "Order"
+    optional: true
+- tapOn:
+    text: "点餐"
+    optional: true
+- takeScreenshot: 02_order
+
+- swipe:
+    start: 50%, 80%
+    end: 50%, 20%
+- takeScreenshot: 03_menu_swipe_1
+
+- swipe:
+    start: 50%, 80%
+    end: 50%, 20%
+- takeScreenshot: 04_menu_swipe_2
+
+- tapOn:
+    text: "Deals"
+    optional: true
+- tapOn:
+    text: "优惠"
+    optional: true
+- takeScreenshot: 05_deals
+
+- tapOn:
+    text: "Rewards"
+    optional: true
+- tapOn:
+    text: "积分"
+    optional: true
+- takeScreenshot: 06_rewards

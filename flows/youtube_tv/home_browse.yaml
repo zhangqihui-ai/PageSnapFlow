@@ -1,0 +1,53 @@
+# YouTube TV - home browse and scroll
+# Package: adb shell pm list packages | findstr -i youtube
+
+appId: com.google.android.apps.youtube.unplugged
+
+---
+- launchApp
+- runFlow:
+    label: Dismiss permissions
+    commands:
+      - tapOn: { text: "Allow", optional: true }
+      - tapOn: { text: "允许", optional: true }
+- runFlow:
+    label: Dismiss dialogs
+    commands:
+      - tapOn: { text: "Skip", optional: true }
+      - tapOn: { text: "跳过", optional: true }
+      - tapOn: { text: "Close", optional: true }
+      - tapOn: { text: "关闭", optional: true }
+- takeScreenshot: 01_home
+
+- swipe:
+    start: 50%, 75%
+    end: 50%, 25%
+- takeScreenshot: 02_home_swipe_1
+
+- swipe:
+    start: 50%, 75%
+    end: 50%, 25%
+- takeScreenshot: 03_home_swipe_2
+
+- tapOn:
+    text: "Library"
+    optional: true
+- takeScreenshot: 04_library
+
+- tapOn:
+    text: "Live"
+    optional: true
+- takeScreenshot: 05_live
+
+- tapOn:
+    text: "Search"
+    optional: true
+- takeScreenshot: 06_search
+
+- tapOn:
+    point: 30%, 40%
+    optional: true
+- takeScreenshot: 07_content_detail
+
+- back
+- takeScreenshot: 08_back

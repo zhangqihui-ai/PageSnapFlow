@@ -1,0 +1,48 @@
+# Booking.com - search and hotel list scroll
+# Package: adb shell pm list packages | findstr -i booking
+
+appId: com.booking
+
+---
+- launchApp
+- runFlow:
+    label: Dismiss permissions
+    commands:
+      - tapOn: { text: "Allow", optional: true }
+      - tapOn: { text: "允许", optional: true }
+- runFlow:
+    label: Dismiss dialogs
+    commands:
+      - tapOn: { text: "Skip", optional: true }
+      - tapOn: { text: "跳过", optional: true }
+      - tapOn: { text: "Close", optional: true }
+      - tapOn: { text: "关闭", optional: true }
+- takeScreenshot: 01_home
+
+- extendedWaitUntil:
+    visible: "Search"
+    timeout: 15000
+- takeScreenshot: 02_search_ready
+
+- swipe:
+    start: 50%, 75%
+    end: 50%, 25%
+- takeScreenshot: 03_home_swipe
+
+- tapOn:
+    text: "Stays"
+    optional: true
+- takeScreenshot: 04_stays_tab
+
+- tapOn:
+    text: "Flights"
+    optional: true
+- takeScreenshot: 05_flights_tab
+
+- tapOn:
+    text: "Car rental"
+    optional: true
+- takeScreenshot: 06_cars_tab
+
+- back
+- takeScreenshot: 07_back_home

@@ -1,0 +1,43 @@
+# TapTap scroll turbo: same coverage, zero post-swipe waits.
+
+appId: com.taptap
+
+---
+- runFlow: ../common/ensure_taptap_ready.yaml
+
+- runFlow:
+    label: Dismiss dialogs if shown
+    commands:
+      - tapOn: { text: "允许", optional: true }
+      - tapOn: { text: "跳过", optional: true }
+      - tapOn: { text: "关闭", optional: true }
+
+- tapOn:
+    point: "10%, 96%"
+- waitForAnimationToEnd:
+    timeout: 200
+
+- tapOn:
+    text: "推荐"
+    optional: true
+- tapOn:
+    point: "8%, 12%"
+    optional: true
+
+- swipe:
+    start: 50%, 40%
+    end: 50%, 70%
+    duration: 160
+
+- takeScreenshot: b1t1_00_start
+
+- evalScript: ${output.n = 0}
+- repeat:
+    times: 99
+    commands:
+      - swipe:
+          start: 50%, 60%
+          end: 50%, 28%
+          duration: 160
+      - evalScript: ${output.n = output.n + 1}
+      - takeScreenshot: ${'b1t1_' + output.n}
