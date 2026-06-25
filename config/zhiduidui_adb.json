@@ -1,0 +1,56 @@
+{
+  "package": "com.xuniu.ocean",
+  "navigation": {
+    "tap_delay_ms": 400
+  },
+  "tabs": {
+    "local_jobs": {
+      "prefix": "local_jobs",
+      "flow": "home_local_jobs_scroll",
+      "scroll": {
+        "start": "50%, 72%",
+        "end": "50%, 38%",
+        "duration_ms": 280,
+        "post_swipe_delay_ms": 200,
+        "pre_capture_delay_ms": 800,
+        "initial_capture_delay_ms": 500,
+        "nudge_start": "50%, 56%",
+        "nudge_end": "50%, 50%",
+        "nudge_duration_ms": 180,
+        "max_nudges": 4
+      },
+      "feed_margins": {
+        "top": 0.24,
+        "bottom": 0.88,
+        "band_ratio": 0.05,
+        "footer_top": 0.875,
+        "footer_bottom": 0.905
+      }
+    }
+  },
+  "scroll": {
+    "start": "50%, 72%",
+    "end": "50%, 38%",
+    "duration_ms": 280,
+    "post_swipe_delay_ms": 200,
+    "pre_capture_delay_ms": 800
+  },
+  "feed_margins": {
+    "top": 0.24,
+    "bottom": 0.88,
+    "band_ratio": 0.05
+  },
+  "capture": {
+    "target_count": 10,
+    "max_attempts": 80,
+    "duplicate_threshold": 0.93,
+    "skip_navigation": true,
+    "until_bottom": {
+      "stop_after_consecutive_duplicates": 3,
+      "bottom_extra_swipes": 3,
+      "bottom_threshold": 0.985,
+      "max_shots": 5000,
+      "progress_every": 25
+    }
+  }
+}

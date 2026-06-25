@@ -44,6 +44,14 @@ apps:
     adb_flows:
       - home_recommend_scroll
 
+  zhiduidui:
+    display_name: 职堆堆兼职
+    package: com.xuniu.ocean
+    flows:
+      - home_local_jobs_scroll
+    adb_flows:
+      - home_local_jobs_scroll
+
   playstation:
     display_name: PlayStation App
     package: com.scee.psxandroid
