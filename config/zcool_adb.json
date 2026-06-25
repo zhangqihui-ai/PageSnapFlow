@@ -1,0 +1,141 @@
+{
+  "package": "com.zcool.community",
+  "navigation": {
+    "home_tab": "12%, 96%",
+    "recommend_tab": "35%, 27%",
+    "tap_delay_ms": 400
+  },
+  "tabs": {
+    "recommend": {
+      "point": "35%, 27%",
+      "prefix": "home_recommend",
+      "flow": "home_recommend_scroll"
+    },
+    "first_pick": {
+      "point": "55%, 27%",
+      "prefix": "home_first_pick",
+      "flow": "home_first_pick_scroll",
+      "scroll": {
+        "start": "50%, 78%",
+        "end": "50%, 36%",
+        "duration_ms": 300,
+        "post_swipe_delay_ms": 400,
+        "nudge_start": "50%, 58%",
+        "nudge_end": "50%, 52%",
+        "nudge_duration_ms": 180,
+        "max_nudges": 8
+      },
+      "feed_margins": {
+        "top": 0.30,
+        "bottom": 0.865,
+        "band_ratio": 0.05
+      }
+    },
+    "video": {
+      "mode": "video_feed",
+      "bottom_tab": "30%, 96%",
+      "prefix": "video",
+      "flow": "video_scroll",
+      "skip_deduplication": true,
+      "feed_margins": {
+        "top": 0.08,
+        "bottom": 0.75,
+        "band_ratio": 0.05
+      },
+      "scroll": {
+        "start": "50%, 16%",
+        "end": "50%, 84%",
+        "duration_ms": 300,
+        "fling_duration_ms": 80,
+        "post_swipe_delay_ms": 150,
+        "pre_capture_delay_ms": 1000,
+        "initial_capture_delay_ms": 500,
+        "advance_change_threshold": 0.88
+      }
+    },
+    "competition": {
+      "prefix": "competition",
+      "flow": "competition_scroll",
+      "scroll": {
+        "start": "50%, 78%",
+        "end": "50%, 36%",
+        "duration_ms": 300,
+        "post_swipe_delay_ms": 200,
+        "pre_capture_delay_ms": 1000,
+        "initial_capture_delay_ms": 500,
+        "nudge_start": "50%, 58%",
+        "nudge_end": "50%, 52%",
+        "nudge_duration_ms": 180,
+        "max_nudges": 6
+      },
+      "feed_margins": {
+        "top": 0.19,
+        "bottom": 0.93,
+        "band_ratio": 0.05
+      }
+    },
+    "online_activity": {
+      "prefix": "online_activity",
+      "flow": "online_activity_scroll",
+      "scroll": {
+        "start": "50%, 78%",
+        "end": "50%, 36%",
+        "duration_ms": 300,
+        "post_swipe_delay_ms": 200,
+        "pre_capture_delay_ms": 1000,
+        "initial_capture_delay_ms": 500,
+        "nudge_start": "50%, 58%",
+        "nudge_end": "50%, 52%",
+        "nudge_duration_ms": 180,
+        "max_nudges": 6
+      },
+      "feed_margins": {
+        "top": 0.19,
+        "bottom": 0.93,
+        "band_ratio": 0.05
+      }
+    }
+  },
+  "scroll": {
+    "start": "50%, 74%",
+    "end": "50%, 44%",
+    "duration_ms": 280,
+    "post_swipe_delay_ms": 350,
+    "extra_swipe_on_duplicate": true,
+    "nudge_start": "50%, 56%",
+    "nudge_end": "50%, 51%",
+    "nudge_duration_ms": 180,
+    "max_nudges": 6,
+    "scroll_to_top_start": "50%, 28%",
+    "scroll_to_top_end": "50%, 78%",
+    "scroll_to_top_duration_ms": 200,
+    "scroll_to_top_repeats": 8
+  },
+  "feed_margins": {
+    "top": 0.265,
+    "bottom": 0.865,
+    "band_ratio": 0.055
+  },
+  "capture": {
+    "target_count": 10,
+    "max_attempts": 50,
+    "duplicate_threshold": 0.93,
+    "prefix": "home_recommend",
+    "skip_navigation": true,
+    "scroll_to_top_on_start": false,
+    "hide_system_nav_bar": false,
+    "hide_gesture_hint": false,
+    "gesture_hint_use_overlay": false,
+    "relaunch_for_nav_bar": false,
+    "crop_system_gesture_bar": false,
+    "crop_system_gesture_ratio": 0.062,
+    "until_bottom": {
+      "stop_after_consecutive_duplicates": 3,
+      "bottom_extra_swipes": 4,
+      "bottom_threshold": 0.985,
+      "max_shots": 5000,
+      "progress_every": 25,
+      "scroll_to_top_repeats": 24
+    }
+  }
+}

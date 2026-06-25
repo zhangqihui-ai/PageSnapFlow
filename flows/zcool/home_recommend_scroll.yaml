@@ -1,0 +1,47 @@
+# 站酷 - 首页 > 推荐：纵向滚动截图（Maestro 备用流程）
+# 推荐用 ADB 采集：run_zcool_home_recommend.bat
+
+appId: com.zcool.community
+
+---
+- launchApp
+
+- runFlow:
+    label: Dismiss permissions
+    commands:
+      - tapOn: { text: "Allow", optional: true }
+      - tapOn: { text: "允许", optional: true }
+
+- runFlow:
+    label: Dismiss dialogs
+    commands:
+      - tapOn: { text: "Skip", optional: true }
+      - tapOn: { text: "跳过", optional: true }
+      - tapOn: { text: "关闭", optional: true }
+      - tapOn: { text: "关闭", optional: true }
+
+- tapOn:
+    point: "12%, 96%"
+- tapOn:
+    text: "推荐"
+    optional: true
+- tapOn:
+    point: "35%, 27%"
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 500
+
+- takeScreenshot: home_recommend_00_overview
+
+- evalScript: ${output.n = 1}
+- repeat:
+    times: 9
+    commands:
+      - swipe:
+          start: 50%, 70%
+          end: 50%, 48%
+          duration: 280
+      - waitForAnimationToEnd:
+          timeout: 400
+      - takeScreenshot: ${'home_recommend_' + String(output.n).padStart(2, '0') + '_scroll'}
+      - evalScript: ${output.n = output.n + 1}

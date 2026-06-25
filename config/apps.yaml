@@ -39,6 +39,10 @@ apps:
     package: com.zcool.community
     flows:
       - home_browse
+      - home_recommend_scroll
+      - home_first_pick_scroll
+    adb_flows:
+      - home_recommend_scroll
 
   playstation:
     display_name: PlayStation App
