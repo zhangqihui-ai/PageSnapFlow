@@ -1,0 +1,98 @@
+# Booking.com hotel list scroll capture (ADB)
+# Prerequisite: user is on search results (e.g. Beijing hotel list)
+#
+# Layout (1080x2400): fixed header ~30%, each hotel card ~31% height, ~3 cards visible.
+# Rule: #1 and #2 fully visible; #3 may be partial. Each step scrolls so prev #3 -> new #1.
+
+package: com.booking
+
+adb_capture:
+  tap_delay_ms: 80
+  post_swipe_delay_ms: 180
+  duplicate_threshold: 0.985
+  skip_duplicate_saves: false
+  list_ready_wait_ms: 800
+  list_ready_retries: 5
+
+# List geometry (ratios of screen height, 1080x2400)
+list_top_ratio: 0.295         # overview: first hotel below "623家住宿"
+scroll_list_top_ratio: 0.195  # scrolled: nudge content down-list to the top divider
+card_height_ratio: 0.304
+cards_per_step: 2
+
+# Finger down: reveal hotel name below sticky bar (overview + scroll steps)
+unclip_swipe:
+  start: "50%, 36%"
+  end: "50%, 46%"
+  duration: 260
+
+reveal_hotel_name:
+  start: "50%, 36%"
+  end: "50%, 45%"
+  duration: 220
+
+# Slightly longer finger-down nudge after scroll steps (name under sticky bar)
+scroll_reveal_hotel_name:
+  start: "50%, 34%"
+  end: "50%, 47%"
+  duration: 240
+
+# Main step: advance ~2 hotel cards (prev #3 lands at #1)
+list_swipe:
+  start: "50%, 66%"
+  end: "50%, 46%"
+  duration: 320
+  start_ratio: 0.72
+  min_end_ratio: 0.10
+  max_single_ratio: 0.50
+  pass_wait_ms: 80
+
+# Under-scrolled: prev #2 still at top
+extra_swipe:
+  start: "50%, 60%"
+  end: "50%, 44%"
+  duration: 320
+
+# Finger down in list area → content back to top (show filter chips + 623家住宿)
+scroll_to_top:
+  start: "50%, 35%"
+  end: "50%, 85%"
+  duration: 450
+  repeat: 18
+  wait_ms: 80
+
+alignment:
+  adjust_wait_ms: 120
+  overview_max_attempts: 5
+  local_quality_retries: 2
+
+ui_alignment:
+  enabled: true
+  list_top_ratio: 0.205
+  min_full_card_ratio: 0.22
+  max_top_gap_ratio: 0.035
+  top_padding_ratio: 0.012
+  desired_top_padding_ratio: 0.018
+  top_tolerance_ratio: 0.010
+  max_passes: 2
+
+# Scroll by detected white separator between hotel cards (fast, pixel-accurate)
+divider_alignment:
+  min_below_list_top: 0.06
+  min_first_divider_gap: 0.18
+  min_card_gap: 0.24
+  scan_x1: 0.02
+  scan_x2: 0.98
+  scan_y_max: 0.97
+  fallback_card_height: 0.304
+  step_extra_ratio: 0.0
+  top_partial_divider_threshold: 0.43
+  top_divider_target: 0.205
+  max_nudge_attempts: 0
+  nudge_tolerance: 0.010
+  require_first_card_aligned: true
+  first_divider_tolerance: 0.120
+
+pilot:
+  max_shots: 10
+  max_dup_retries: 4

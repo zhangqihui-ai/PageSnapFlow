@@ -21,6 +21,147 @@ if str(_SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPT_DIR))
 
 from image_similarity import count_unique_images, signature_from_path, similarity
+from taptap_feed_alignment import align_frame, alignment_cfg, card_step_px, swipe_pixels as align_swipe_pixels
+
+
+def uiautomator_dump(adb: AdbDevice, *, timeout_sec: int = 12) -> str:
+    cmd = ["adb", "-s", adb.device, "exec-out", "uiautomator", "dump", "/dev/tty"]
+    proc = subprocess.run(cmd, check=True, capture_output=True, timeout=timeout_sec)
+    return (proc.stdout or b"").decode("utf-8", errors="replace")
+
+
+def uiautomator_has_markers(adb: AdbDevice, markers: list[str]) -> bool:
+    if not markers:
+        return False
+    try:
+        dump = uiautomator_dump(adb)
+    except Exception as exc:
+        print(f"  bottom marker: uiautomator skipped ({exc})", flush=True)
+        return False
+    return any(marker in dump for marker in markers)
+
+
+def image_has_footer_marker(image_path: Path, cfg: dict) -> bool:
+    import cv2
+    import numpy as np
+
+    img = cv2.imread(str(image_path))
+    if img is None:
+        return False
+    h, w = img.shape[:2]
+    top = int(float(cfg.get("top_ratio", 0.76)) * h)
+    bottom = int(float(cfg.get("bottom_ratio", 0.855)) * h)
+    left = int(float(cfg.get("left_ratio", 0.28)) * w)
+    right = int(float(cfg.get("right_ratio", 0.72)) * w)
+    if bottom <= top or right <= left:
+        return False
+    roi = img[top:bottom, left:right]
+    gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+    gray_min = int(cfg.get("gray_min", 130))
+    gray_max = int(cfg.get("gray_max", 195))
+    mask = (gray >= gray_min) & (gray <= gray_max)
+    fill_ratio = float(mask.mean())
+    min_fill = float(cfg.get("min_fill_ratio", 0.008))
+    max_fill = float(cfg.get("max_fill_ratio", 0.22))
+    if fill_ratio < min_fill or fill_ratio > max_fill:
+        return False
+    row_peak_threshold = float(cfg.get("row_peak_threshold", 0.10))
+    peak_rows = int((mask.mean(axis=1) > row_peak_threshold).sum())
+    min_peak_rows = int(cfg.get("min_peak_rows", 1))
+    max_peak_rows = int(cfg.get("max_peak_rows", 5))
+    return min_peak_rows <= peak_rows <= max_peak_rows
+
+
+def scroll_end_reached(
+    adb: AdbDevice,
+    *,
+    markers: list[str],
+    image_path: Path | None,
+    cfg: dict,
+) -> bool:
+    if not markers:
+        return False
+    if uiautomator_has_markers(adb, markers):
+        print(f"  bottom marker detected via UI: {markers[0]}", flush=True)
+        return True
+    footer_cfg = cfg.get("footer_detect") or {}
+    if footer_cfg.get("enabled", True) and image_path is not None and image_path.is_file():
+        if image_has_footer_marker(image_path, footer_cfg):
+            print(f"  bottom marker detected via footer band (expect: {markers[0]})", flush=True)
+            return True
+    return False
+
+
+def image_has_loading_footer(image_path: Path, cfg: dict) -> bool:
+    """Detect centered 「加载中」 band above bottom nav (higher than 暂无更多 footer)."""
+    import cv2
+    import numpy as np
+
+    img = cv2.imread(str(image_path))
+    if img is None:
+        return False
+    h, w = img.shape[:2]
+    top = int(float(cfg.get("top_ratio", 0.845)) * h)
+    bottom = int(float(cfg.get("bottom_ratio", 0.905)) * h)
+    left = int(float(cfg.get("left_ratio", 0.38)) * w)
+    right = int(float(cfg.get("right_ratio", 0.62)) * w)
+    if bottom <= top or right <= left:
+        return False
+    gray = cv2.cvtColor(img[top:bottom, left:right], cv2.COLOR_BGR2GRAY)
+    gray_min = int(cfg.get("gray_min", 135))
+    gray_max = int(cfg.get("gray_max", 200))
+    mask = (gray >= gray_min) & (gray <= gray_max)
+    fill_ratio = float(mask.mean())
+    min_fill = float(cfg.get("min_fill_ratio", 0.010))
+    max_fill = float(cfg.get("max_fill_ratio", 0.10))
+    if fill_ratio < min_fill or fill_ratio > max_fill:
+        return False
+    row_peak_threshold = float(cfg.get("row_peak_threshold", 0.12))
+    peak_rows = int((mask.mean(axis=1) > row_peak_threshold).sum())
+    min_peak_rows = int(cfg.get("min_peak_rows", 1))
+    max_peak_rows = int(cfg.get("max_peak_rows", 4))
+    return min_peak_rows <= peak_rows <= max_peak_rows
+
+
+def screen_loading_visible(
+    adb: AdbDevice,
+    markers: list[str],
+    *,
+    image_path: Path | None = None,
+    cfg: dict | None = None,
+) -> bool:
+    if not markers:
+        return False
+    if uiautomator_has_markers(adb, markers):
+        return True
+    loading_img_cfg = (cfg or {}).get("loading_detect") or {}
+    if loading_img_cfg.get("enabled", True) and image_path is not None and image_path.is_file():
+        return image_has_loading_footer(image_path, loading_img_cfg)
+    return False
+
+
+def wait_for_scroll_loading_done(
+    adb: AdbDevice,
+    *,
+    markers: list[str],
+    cfg: dict | None = None,
+) -> bool:
+    if not markers:
+        return True
+    opts = cfg or {}
+    timeout_ms = int(opts.get("timeout_ms", 8000))
+    poll_ms = int(opts.get("poll_ms", 350))
+    settle_ms = int(opts.get("settle_ms", 250))
+    deadline = time.time() + timeout_ms / 1000.0
+    while time.time() < deadline:
+        if not uiautomator_has_markers(adb, markers):
+            if settle_ms > 0:
+                adb.sleep_ms(settle_ms)
+            if not uiautomator_has_markers(adb, markers):
+                return True
+        adb.sleep_ms(poll_ms)
+    print(f"  warning: still loading after {timeout_ms}ms ({markers[0]}), continuing", flush=True)
+    return False
 
 
 def safe_unlink(path: Path, retries: int = 5, delay_ms: int = 80) -> bool:
@@ -280,6 +421,36 @@ class ShotWriter:
             self.last_sig = sig
         return dest, is_duplicate
 
+    def capture_from_path(self, source: Path, label: str) -> tuple[Path | None, bool]:
+        safe_label = re.sub(r"[^\w\-]+", "_", label).strip("_") or "shot"
+        filename = f"{self.prefix}_{self.seq:03d}_{safe_label}.png"
+        dest = self.shots_dir / filename
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(source.read_bytes())
+        safe_unlink(source)
+
+        sig = signature_from_path(dest)
+        is_duplicate = False
+        if sig is not None and self.last_sig is not None and self.duplicate_threshold is not None:
+            is_duplicate = similarity(sig, self.last_sig) >= self.duplicate_threshold
+
+        if is_duplicate and self.skip_duplicate_saves:
+            if not safe_unlink(dest):
+                print(f"  warning: duplicate kept (file locked): {dest.name}", flush=True)
+                self.paths.append(dest)
+                self.seq += 1
+                if sig is not None:
+                    self.last_sig = sig
+                return dest, True
+            self.skipped_duplicates += 1
+            return None, True
+
+        self.paths.append(dest)
+        self.seq += 1
+        if sig is not None:
+            self.last_sig = sig
+        return dest, is_duplicate
+
 
 def load_settings(
     tabs_config_path: Path,
@@ -291,6 +462,10 @@ def load_settings(
     prof_cfg = yaml.safe_load(profiles_config_path.read_text(encoding="utf-8"))
     timing = dict(adb_cfg.get("adb_capture", {}))
     timing["capture_defaults"] = adb_cfg.get("capture_defaults", {})
+    if adb_cfg.get("feed_alignment"):
+        tabs["feed_alignment"] = adb_cfg["feed_alignment"]
+    if adb_cfg.get("today_alignment"):
+        tabs["today_alignment"] = adb_cfg["today_alignment"]
     capture_profiles = prof_cfg.get("profiles", {})
     return tabs, adb_cfg.get("flow_profiles", {}), timing, capture_profiles
 
@@ -458,24 +633,94 @@ def capture_scroll_strategy(
     max_swipes: int | None = None,
     include_intro: bool = True,
     name_prefix: str = "scroll",
+    start_scroll_index: int = 1,
 ) -> None:
     scroll_swipes = int(max_swipes if max_swipes is not None else top.get("scroll_swipes", config["scroll_swipes"]))
-    feed = config["feed_swipe"]
+    if start_scroll_index > scroll_swipes:
+        print(f"  scroll: nothing to do (start={start_scroll_index}, max={scroll_swipes})", flush=True)
+        return
     scroll_to_top = config["scroll_to_top"]
     defaults = timing.get("capture_defaults", {})
     overrides = top.get("capture", {})
     capture_cfg = {**defaults, **overrides}
+    feed = dict(config["feed_swipe"])
+    swipe_override = capture_cfg.get("feed_swipe")
+    if isinstance(swipe_override, dict):
+        feed = {**feed, **swipe_override}
     stop_after_dupes = int(capture_cfg.get("scroll_stop_after_dupes", 3))
+    bottom_markers = list(capture_cfg.get("scroll_bottom_markers") or [])
+    loading_markers = list(capture_cfg.get("scroll_loading_markers") or [])
+    loading_wait_cfg = dict(capture_cfg.get("loading_wait") or {})
+
+    align_cfg = alignment_cfg(config)
+    align_override = capture_cfg.get("feed_alignment")
+    if align_override is False:
+        align_cfg["enabled"] = False
+    elif align_override is True:
+        align_cfg["enabled"] = True
+    use_alignment = bool(align_cfg.get("enabled", False))
+
+    def save_frame(label: str) -> tuple[Path | None, bool]:
+        if loading_markers:
+            wait_for_scroll_loading_done(adb, markers=loading_markers, cfg=loading_wait_cfg)
+        if use_alignment:
+            temp, _report = align_frame(
+                adb,
+                config,
+                post_swipe_delay_ms=post_swipe_delay_ms,
+                overrides=align_cfg,
+            )
+            if temp is not None:
+                path, is_dup = writer.capture_from_path(temp, label)
+            else:
+                path, is_dup = None, False
+        else:
+            path, is_dup = writer.capture(label)
+        if loading_markers and path is not None:
+            max_retries = int(loading_wait_cfg.get("max_retries", 2))
+            for attempt in range(max_retries):
+                if not screen_loading_visible(
+                    adb, loading_markers, image_path=path, cfg=capture_cfg
+                ):
+                    break
+                print(
+                    f"  loading visible after capture, waiting ({attempt + 1}/{max_retries})...",
+                    flush=True,
+                )
+                wait_for_scroll_loading_done(adb, markers=loading_markers, cfg=loading_wait_cfg)
+                safe_unlink(path)
+                if writer.paths and writer.paths[-1] == path:
+                    writer.paths.pop()
+                writer.seq -= 1
+                if writer.paths:
+                    writer.last_sig = signature_from_path(writer.paths[-1])
+                else:
+                    writer.last_sig = None
+                path, is_dup = writer.capture(label)
+        return path, is_dup
 
     if include_intro:
         adb.swipe_points(scroll_to_top["start"], scroll_to_top["end"], int(scroll_to_top["duration"]))
-        writer.capture("overview")
+        path, is_dup = save_frame("overview")
+        if is_dup and writer.skip_duplicate_saves:
+            pass
+        if bottom_markers and path is not None:
+            if scroll_end_reached(adb, markers=bottom_markers, image_path=path, cfg=capture_cfg):
+                print("  scroll: already at bottom before scrolling", flush=True)
+                return
 
     consecutive_dupes = 0
-    for n in range(1, scroll_swipes + 1):
-        adb.swipe_points(feed["start"], feed["end"], int(feed["duration"]))
+    for n in range(start_scroll_index, scroll_swipes + 1):
+        if use_alignment:
+            align_swipe_pixels(adb, align_cfg, card_step_px(config, adb.size[1]))
+        else:
+            adb.swipe_points(feed["start"], feed["end"], int(feed["duration"]))
         adb.sleep_ms(post_swipe_delay_ms)
-        _, is_dup = writer.capture(f"{name_prefix}_{n:02d}")
+        path, is_dup = save_frame(f"{name_prefix}_{n:02d}")
+        if bottom_markers and path is not None:
+            if scroll_end_reached(adb, markers=bottom_markers, image_path=path, cfg=capture_cfg):
+                print(f"  scroll: stopped at {n} (reached bottom)", flush=True)
+                break
         if is_dup:
             consecutive_dupes += 1
             if consecutive_dupes >= stop_after_dupes:

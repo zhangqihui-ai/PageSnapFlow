@@ -18,6 +18,51 @@ flow_profiles:
     prefix_map:
       b01_t02: b01_t02
 
+  scroll_tapmake_pilot:
+    segments: [b01_t03]
+    prefix_map:
+      b01_t03: b01_t03
+
+  scroll_category_pilot:
+    segments: [b01_t04]
+    prefix_map:
+      b01_t04: b01_t04
+
+  scroll_pc_pilot:
+    segments: [b01_t05]
+    prefix_map:
+      b01_t05: b01_t05
+
+  scroll_sharewall_pilot:
+    segments: [b01_t06]
+    prefix_map:
+      b01_t06: b01_t06
+
+  scroll_rank_hot_pilot:
+    segments: [b02_t01]
+    prefix_map:
+      b02_t01: b02_t01
+
+  scroll_rank_reserve_pilot:
+    segments: [b02_t02]
+    prefix_map:
+      b02_t02: b02_t02
+
+  scroll_rank_playing_pilot:
+    segments: [b02_t03]
+    prefix_map:
+      b02_t03: b02_t03
+
+  scroll_rank_new_pilot:
+    segments: [b02_t04]
+    prefix_map:
+      b02_t04: b02_t04
+
+  scroll_community_discover_pilot:
+    segments: [b03_t02]
+    prefix_map:
+      b03_t02: b03_t02
+
 # ADB timing (no UI settle; optional minimal delays)
 adb_capture:
   tap_delay_ms: 150
@@ -25,5 +70,192 @@ adb_capture:
   duplicate_threshold: 0.95
   skip_duplicate_saves: true
 
+# Feed scroll framing: card text metadata fully visible at bottom; image may clip at top
+feed_alignment:
+  enabled: true
+  feed_top_ratio: 0.145
+  feed_bottom_ratio: 0.915
+  target_text_bottom_ratio: 0.906
+  bottom_tolerance_ratio: 0.012
+  card_step_ratio: 0.34
+  max_nudge_attempts: 4
+  adjust_wait_ms: 120
+
+# Today Games list: keep first game text below sticky header; bottom may clip
+today_alignment:
+  enabled: true
+  list_top_ratio: 0.355
+  feed_bottom_ratio: 0.915
+  header_skip_ratio: 0.045
+  target_text_top_ratio: 0.375
+  top_tolerance_ratio: 0.012
+  min_game_text_height_ratio: 0.042
+  min_game_text_top_ratio: 0.025
+  first_card_scan_max_ratio: 0.58
+  list_ready_min_std: 22.0
+  list_ready_wait_ms: 900
+  list_swipe:
+    start: "50%, 68%"
+    end: "50%, 42%"
+    duration: 260
+  card_step_ratio: 0.31
+  max_nudge_attempts: 4
+  adjust_wait_ms: 120
+
 capture_defaults:
   scroll_stop_after_dupes: 3
+
+# Tap制造 / 游戏分类 long feed: similar list rows
+tapmake_capture:
+  max_scroll_swipes: 500
+  scroll_stop_after_dupes: 15
+  duplicate_threshold: 0.992
+
+category_capture:
+  max_scroll_swipes: 500
+  scroll_stop_after_dupes: 15
+  duplicate_threshold: 0.992
+
+pc_capture:
+  max_scroll_swipes: 500
+  scroll_stop_after_dupes: 15
+  duplicate_threshold: 0.992
+  scroll_bottom_markers:
+    - "暂无更多"
+  footer_detect:
+    enabled: true
+    top_ratio: 0.76
+    bottom_ratio: 0.855
+    left_ratio: 0.28
+    right_ratio: 0.72
+    gray_min: 130
+    gray_max: 195
+    min_fill_ratio: 0.008
+    max_fill_ratio: 0.22
+    row_peak_threshold: 0.10
+    min_peak_rows: 1
+    max_peak_rows: 5
+
+sharewall_capture:
+  max_scroll_swipes: 500
+  scroll_stop_after_dupes: 15
+  duplicate_threshold: 0.992
+  scroll_bottom_markers:
+    - "暂无更多"
+  footer_detect:
+    enabled: true
+    top_ratio: 0.76
+    bottom_ratio: 0.855
+    left_ratio: 0.28
+    right_ratio: 0.72
+    gray_min: 130
+    gray_max: 195
+    min_fill_ratio: 0.008
+    max_fill_ratio: 0.22
+    row_peak_threshold: 0.10
+    min_peak_rows: 1
+    max_peak_rows: 5
+
+# 排行榜列表: ~8 games/page, top150 => ~19 swipes; rows look similar
+ranking_list_capture: &ranking_list_capture
+  max_scroll_swipes: 25
+  scroll_to_top_repeat: 18
+  scroll_stop_after_dupes: 15
+  duplicate_threshold: 0.98
+  # Default feed_swipe is ~18% screen; rank list needs ~1 page (~8 rows) per swipe
+  feed_swipe:
+    start: "50%, 78%"
+    end: "50%, 18%"
+    duration: 300
+  scroll_bottom_markers:
+    - "暂无更多"
+  scroll_loading_markers:
+    - "加载中"
+  loading_wait:
+    timeout_ms: 10000
+    poll_ms: 400
+    settle_ms: 300
+    max_retries: 3
+  loading_detect:
+    enabled: true
+    top_ratio: 0.845
+    bottom_ratio: 0.905
+    left_ratio: 0.38
+    right_ratio: 0.62
+    gray_min: 135
+    gray_max: 200
+    min_fill_ratio: 0.010
+    max_fill_ratio: 0.10
+    row_peak_threshold: 0.12
+    min_peak_rows: 1
+    max_peak_rows: 4
+  footer_detect:
+    enabled: true
+    top_ratio: 0.76
+    bottom_ratio: 0.855
+    left_ratio: 0.28
+    right_ratio: 0.72
+    gray_min: 130
+    gray_max: 195
+    min_fill_ratio: 0.008
+    max_fill_ratio: 0.22
+    row_peak_threshold: 0.10
+    min_peak_rows: 1
+    max_peak_rows: 5
+
+rank_hot_capture:
+  <<: *ranking_list_capture
+
+rank_reserve_capture:
+  <<: *ranking_list_capture
+
+rank_playing_capture:
+  <<: *ranking_list_capture
+
+rank_new_capture:
+  <<: *ranking_list_capture
+
+community_discover_capture:
+  max_scroll_swipes: 500
+  scroll_stop_after_dupes: 15
+  duplicate_threshold: 0.992
+  # Default feed_swipe is ~18% screen; masonry feed needs larger steps to reduce overlap
+  feed_swipe:
+    start: "50%, 72%"
+    end: "50%, 24%"
+    duration: 280
+  scroll_bottom_markers:
+    - "暂无更多"
+  scroll_loading_markers:
+    - "加载中"
+  loading_wait:
+    timeout_ms: 10000
+    poll_ms: 400
+    settle_ms: 300
+    max_retries: 3
+  loading_detect:
+    enabled: true
+    top_ratio: 0.845
+    bottom_ratio: 0.905
+    left_ratio: 0.38
+    right_ratio: 0.62
+    gray_min: 135
+    gray_max: 200
+    min_fill_ratio: 0.010
+    max_fill_ratio: 0.10
+    row_peak_threshold: 0.12
+    min_peak_rows: 1
+    max_peak_rows: 4
+  footer_detect:
+    enabled: true
+    top_ratio: 0.76
+    bottom_ratio: 0.855
+    left_ratio: 0.28
+    right_ratio: 0.72
+    gray_min: 130
+    gray_max: 195
+    min_fill_ratio: 0.008
+    max_fill_ratio: 0.22
+    row_peak_threshold: 0.10
+    min_peak_rows: 1
+    max_peak_rows: 5
