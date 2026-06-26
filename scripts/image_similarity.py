@@ -12,6 +12,14 @@ THUMB_W = 160
 THUMB_H = 90
 
 
+def imread_unicode(path: Path | str) -> np.ndarray | None:
+    """Read images on Windows paths that may contain non-ASCII characters."""
+    data = np.fromfile(str(path), dtype=np.uint8)
+    if data.size == 0:
+        return None
+    return cv2.imdecode(data, cv2.IMREAD_COLOR)
+
+
 def scene_signature(img: np.ndarray) -> np.ndarray:
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     gray = cv2.GaussianBlur(gray, (7, 7), 0)
@@ -19,10 +27,19 @@ def scene_signature(img: np.ndarray) -> np.ndarray:
 
 
 def signature_from_path(path: Path) -> np.ndarray | None:
-    img = cv2.imread(str(path))
+    img = imread_unicode(path)
     if img is None:
         return None
     return scene_signature(img)
+
+
+def previous_saved_path(paths: list[Path], *, exclude: Path | None = None) -> Path | None:
+    for candidate in reversed(paths):
+        if exclude is not None and candidate == exclude:
+            continue
+        if candidate.is_file():
+            return candidate
+    return None
 
 
 def similarity(left: np.ndarray, right: np.ndarray) -> float:

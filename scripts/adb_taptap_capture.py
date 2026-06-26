@@ -20,7 +20,13 @@ _SCRIPT_DIR = Path(__file__).resolve().parent
 if str(_SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPT_DIR))
 
-from image_similarity import count_unique_images, signature_from_path, similarity
+from image_similarity import (
+    count_unique_images,
+    imread_unicode,
+    previous_saved_path,
+    signature_from_path,
+    similarity,
+)
 from taptap_feed_alignment import align_frame, alignment_cfg, card_step_px, swipe_pixels as align_swipe_pixels
 
 
@@ -28,6 +34,44 @@ def uiautomator_dump(adb: AdbDevice, *, timeout_sec: int = 12) -> str:
     cmd = ["adb", "-s", adb.device, "exec-out", "uiautomator", "dump", "/dev/tty"]
     proc = subprocess.run(cmd, check=True, capture_output=True, timeout=timeout_sec)
     return (proc.stdout or b"").decode("utf-8", errors="replace")
+
+
+def read_window_focus(adb: AdbDevice) -> str:
+    proc = subprocess.run(
+        ["adb", "-s", adb.device, "shell", "dumpsys", "window"],
+        capture_output=True,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        timeout=8,
+    )
+    for line in (proc.stdout or "").splitlines():
+        if "mCurrentFocus" in line or "mFocusedApp" in line:
+            return line.strip()
+    return ""
+
+
+def recover_feed_navigation(adb: AdbDevice, cfg: dict) -> bool:
+    """Press BACK when scroll accidentally opened a detail/article page."""
+    package = str(cfg.get("package") or "")
+    if not package:
+        return False
+    focus = read_window_focus(adb)
+    if package not in focus:
+        return False
+    feed_markers = list(cfg.get("feed_list_activities") or ["MainActivity", "HomeActivity", "IndexActivity"])
+    detail_markers = list(
+        cfg.get("detail_activities")
+        or ["WebView", "Detail", "Article", "NewsInfo", "Content", "InfoActivity", "Html"]
+    )
+    if any(marker in focus for marker in feed_markers):
+        return False
+    if not any(marker in focus for marker in detail_markers):
+        return False
+    print("  recovered from detail page (BACK)", flush=True)
+    adb.press_back()
+    adb.sleep_ms(int(cfg.get("recover_back_wait_ms", 280)))
+    return True
 
 
 def uiautomator_has_markers(adb: AdbDevice, markers: list[str]) -> bool:
@@ -45,7 +89,7 @@ def image_has_footer_marker(image_path: Path, cfg: dict) -> bool:
     import cv2
     import numpy as np
 
-    img = cv2.imread(str(image_path))
+    img = imread_unicode(image_path)
     if img is None:
         return False
     h, w = img.shape[:2]
@@ -81,7 +125,8 @@ def scroll_end_reached(
 ) -> bool:
     if not markers:
         return False
-    if uiautomator_has_markers(adb, markers):
+    use_uia = cfg.get("scroll_end_uiautomator", True)
+    if use_uia and uiautomator_has_markers(adb, markers):
         print(f"  bottom marker detected via UI: {markers[0]}", flush=True)
         return True
     footer_cfg = cfg.get("footer_detect") or {}
@@ -92,12 +137,34 @@ def scroll_end_reached(
     return False
 
 
+def scroll_loading_visible(
+    adb: AdbDevice,
+    *,
+    image_path: Path | None,
+    cfg: dict,
+) -> bool:
+    markers = list(cfg.get("markers") or ["正在加载", "加载中"])
+    if not markers:
+        return False
+    if uiautomator_has_markers(adb, markers):
+        return True
+    if image_path is not None and image_path.is_file():
+        image_cfg = cfg.get("image_detect") or cfg.get("loading_detect")
+        if image_cfg and image_cfg.get("enabled", True):
+            if image_has_loading_footer(image_path, image_cfg):
+                return True
+            bright_cfg = cfg.get("bright_band_detect")
+            if bright_cfg and bright_cfg.get("enabled", True):
+                return image_has_bright_loading_band(image_path, bright_cfg)
+    return False
+
+
 def image_has_loading_footer(image_path: Path, cfg: dict) -> bool:
     """Detect centered 「加载中」 band above bottom nav (higher than 暂无更多 footer)."""
     import cv2
     import numpy as np
 
-    img = cv2.imread(str(image_path))
+    img = imread_unicode(image_path)
     if img is None:
         return False
     h, w = img.shape[:2]
@@ -121,6 +188,33 @@ def image_has_loading_footer(image_path: Path, cfg: dict) -> bool:
     min_peak_rows = int(cfg.get("min_peak_rows", 1))
     max_peak_rows = int(cfg.get("max_peak_rows", 4))
     return min_peak_rows <= peak_rows <= max_peak_rows
+
+
+def image_has_bright_loading_band(image_path: Path, cfg: dict) -> bool:
+    """Henan Daily-style footer: bright band with small loading label/spinner."""
+    import cv2
+    import numpy as np
+
+    img = imread_unicode(image_path)
+    if img is None:
+        return False
+    h, w = img.shape[:2]
+    top = int(float(cfg.get("top_ratio", 0.82)) * h)
+    bottom = int(float(cfg.get("bottom_ratio", 0.905)) * h)
+    left = int(float(cfg.get("left_ratio", 0.25)) * w)
+    right = int(float(cfg.get("right_ratio", 0.75)) * w)
+    if bottom <= top or right <= left:
+        return False
+    gray = cv2.cvtColor(img[top:bottom, left:right], cv2.COLOR_BGR2GRAY)
+    mean = float(gray.mean())
+    dark = float((gray < int(cfg.get("dark_max", 120))).mean())
+    bright = float((gray >= int(cfg.get("bright_min", 200))).mean())
+    return (
+        mean >= float(cfg.get("mean_min", 240))
+        and bright >= float(cfg.get("bright_fill_min", 0.85))
+        and dark >= float(cfg.get("dark_fill_min", 0.008))
+        and dark <= float(cfg.get("dark_fill_max", 0.06))
+    )
 
 
 def screen_loading_visible(
@@ -350,10 +444,24 @@ class AdbDevice:
         self._adb_shell("input", "tap", str(x), str(y))
         self.sleep_ms(self.tap_delay_ms)
 
-    def swipe_points(self, start: str, end: str, duration_ms: int) -> None:
+    def swipe_points(
+        self,
+        start: str,
+        end: str,
+        duration_ms: int,
+        *,
+        min_duration_ms: int = 0,
+    ) -> None:
         w, h = self.size
         x1, y1 = self.parse_point(start, w, h)
         x2, y2 = self.parse_point(end, w, h)
+        duration = max(int(duration_ms), int(min_duration_ms))
+        travel_y = abs(y2 - y1)
+        if travel_y >= int(0.28 * h):
+            duration = max(duration, 380)
+        # Short/fast swipes through clickable rows are often treated as taps.
+        if travel_y < int(0.12 * h):
+            duration = max(duration, 320)
         self._adb_shell(
             "input",
             "swipe",
@@ -361,7 +469,7 @@ class AdbDevice:
             str(y1),
             str(x2),
             str(y2),
-            str(duration_ms),
+            str(duration),
         )
 
     def press_back(self) -> None:
@@ -649,8 +757,13 @@ def capture_scroll_strategy(
         feed = {**feed, **swipe_override}
     stop_after_dupes = int(capture_cfg.get("scroll_stop_after_dupes", 3))
     bottom_markers = list(capture_cfg.get("scroll_bottom_markers") or [])
+    loading_stall_cfg = dict(capture_cfg.get("scroll_loading_stall") or {})
+    loading_stall_markers = list(loading_stall_cfg.get("markers") or ["正在加载", "加载中"])
+    bright_band_cfg = dict(loading_stall_cfg.get("bright_band_detect") or {})
+    overlap_min = float(loading_stall_cfg.get("overlap_min_similarity", 0.86))
     loading_markers = list(capture_cfg.get("scroll_loading_markers") or [])
     loading_wait_cfg = dict(capture_cfg.get("loading_wait") or {})
+    content_settle_cfg = dict(capture_cfg.get("content_settle") or timing.get("content_settle") or {})
 
     align_cfg = alignment_cfg(config)
     align_override = capture_cfg.get("feed_alignment")
@@ -663,6 +776,10 @@ def capture_scroll_strategy(
     def save_frame(label: str) -> tuple[Path | None, bool]:
         if loading_markers:
             wait_for_scroll_loading_done(adb, markers=loading_markers, cfg=loading_wait_cfg)
+        if content_settle_cfg.get("enabled"):
+            from henan_daily_content_settle import wait_for_feed_content_ready
+
+            wait_for_feed_content_ready(adb, content_settle_cfg)
         if use_alignment:
             temp, _report = align_frame(
                 adb,
@@ -697,6 +814,32 @@ def capture_scroll_strategy(
                 else:
                     writer.last_sig = None
                 path, is_dup = writer.capture(label)
+        if content_settle_cfg.get("enabled") and path is not None:
+            from henan_daily_content_settle import (
+                feed_has_placeholder_thumbnails,
+                wait_for_feed_content_ready,
+            )
+
+            max_retries = int(content_settle_cfg.get("max_retries", 2))
+            for attempt in range(max_retries):
+                img = imread_unicode(path)
+                if img is None or not feed_has_placeholder_thumbnails(img, content_settle_cfg):
+                    break
+                print(
+                    f"  placeholder thumbnails visible, waiting ({attempt + 1}/{max_retries})...",
+                    flush=True,
+                )
+                wait_for_feed_content_ready(adb, content_settle_cfg)
+                safe_unlink(path)
+                if writer.paths and writer.paths[-1] == path:
+                    writer.paths.pop()
+                writer.seq -= 1
+                if writer.paths:
+                    last = writer.paths[-1]
+                    writer.last_sig = signature_from_path(last) if last.is_file() else None
+                else:
+                    writer.last_sig = None
+                path, is_dup = writer.capture(label)
         return path, is_dup
 
     if include_intro:
@@ -710,17 +853,152 @@ def capture_scroll_strategy(
                 return
 
     consecutive_dupes = 0
-    for n in range(start_scroll_index, scroll_swipes + 1):
+    loading_streak = 0
+    loading_wait_skips = 0
+    max_loading_wait_skips = int(bright_band_cfg.get("pull_max_wait_skips", 15))
+    guard_cfg = dict(capture_cfg.get("feed_page_guard") or {})
+    use_page_guard = bool(guard_cfg.get("enabled"))
+    if use_page_guard or bright_band_cfg.get("enabled", True):
+        from henan_daily_page_guard import (
+            choose_feed_swipe,
+            ensure_feed_list_page,
+            feed_loading_footer_visible,
+            is_article_detail_page,
+            is_feed_list_page,
+            is_on_feed_shell_no_back,
+            revert_last_capture,
+            wait_for_loading_footer_clear,
+        )
+
+    n = start_scroll_index
+    while n <= scroll_swipes:
+        if use_page_guard:
+            ensure_feed_list_page(adb, guard_cfg)
+        pre_swipe_img = None
+        pre_swipe_temp: Path | None = None
+        if use_page_guard or bright_band_cfg.get("enabled", True):
+            pre_swipe_temp = Path(tempfile.gettempdir()) / f"hnrb_preswipe_{time.time_ns()}.png"
+            adb.screencap(pre_swipe_temp)
+            pre_swipe_img = imread_unicode(pre_swipe_temp)
+            if use_page_guard and pre_swipe_img is not None and is_article_detail_page(pre_swipe_img, guard_cfg):
+                print(f"  scroll {n}: detail page before swipe, returning to feed", flush=True)
+                pre_swipe_temp.unlink(missing_ok=True)
+                pre_swipe_temp = None
+                pre_swipe_img = None
+                ensure_feed_list_page(adb, guard_cfg)
+                continue
+            if (
+                pre_swipe_img is not None
+                and bright_band_cfg.get("enabled", True)
+                and feed_loading_footer_visible(pre_swipe_img, bright_band_cfg)
+            ):
+                print(f"  scroll {n}: 正在加载 footer visible, waiting (no swipe)", flush=True)
+                if not wait_for_loading_footer_clear(adb, bright_band_cfg):
+                    loading_wait_skips += 1
+                    print(f"  scroll {n}: still loading after wait, skip swipe to avoid mis-tap", flush=True)
+                    if loading_wait_skips >= max_loading_wait_skips:
+                        print(
+                            f"  scroll: stopped at {n} "
+                            f"(loading footer persisted {loading_wait_skips}x, likely at bottom)",
+                            flush=True,
+                        )
+                        break
+                    continue
+                pre_swipe_temp.unlink(missing_ok=True)
+                pre_swipe_temp = Path(tempfile.gettempdir()) / f"hnrb_preswipe_{time.time_ns()}.png"
+                adb.screencap(pre_swipe_temp)
+                pre_swipe_img = imread_unicode(pre_swipe_temp)
+                if (
+                    pre_swipe_img is not None
+                    and bright_band_cfg.get("enabled", True)
+                    and feed_loading_footer_visible(pre_swipe_img, bright_band_cfg)
+                ):
+                    loading_wait_skips += 1
+                    print(f"  scroll {n}: loading still present, skip swipe", flush=True)
+                    if loading_wait_skips >= max_loading_wait_skips:
+                        print(
+                            f"  scroll: stopped at {n} "
+                            f"(loading footer persisted {loading_wait_skips}x, likely at bottom)",
+                            flush=True,
+                        )
+                        break
+                    continue
+                loading_wait_skips = 0
         if use_alignment:
             align_swipe_pixels(adb, align_cfg, card_step_px(config, adb.size[1]))
         else:
-            adb.swipe_points(feed["start"], feed["end"], int(feed["duration"]))
+            if pre_swipe_img is not None:
+                start, end, swipe_duration, min_swipe_duration = choose_feed_swipe(
+                    feed,
+                    pre_swipe_img,
+                    bright_band_cfg=bright_band_cfg if bright_band_cfg.get("enabled", True) else None,
+                )
+            else:
+                start, end = feed["start"], feed["end"]
+                swipe_duration = int(feed["duration"])
+                min_swipe_duration = int(feed.get("min_duration", 0))
+            adb.swipe_points(
+                start,
+                end,
+                swipe_duration,
+                min_duration_ms=min_swipe_duration,
+            )
+        if pre_swipe_temp is not None:
+            pre_swipe_temp.unlink(missing_ok=True)
         adb.sleep_ms(post_swipe_delay_ms)
         path, is_dup = save_frame(f"{name_prefix}_{n:02d}")
+        if use_page_guard and path is not None:
+            img = imread_unicode(path)
+            if img is not None and not is_on_feed_shell_no_back(img, guard_cfg):
+                print(f"  scroll {n}: left 新闻-精选 feed, discarding shot and going back", flush=True)
+                revert_last_capture(writer, path)
+                path = None
+                ensure_feed_list_page(adb, guard_cfg)
+                continue
         if bottom_markers and path is not None:
-            if scroll_end_reached(adb, markers=bottom_markers, image_path=path, cfg=capture_cfg):
+            shot_img = imread_unicode(path)
+            on_feed = not use_page_guard or (shot_img is not None and is_feed_list_page(shot_img, guard_cfg))
+            if on_feed and scroll_end_reached(adb, markers=bottom_markers, image_path=path, cfg=capture_cfg):
                 print(f"  scroll: stopped at {n} (reached bottom)", flush=True)
                 break
+        if loading_stall_cfg.get("enabled") and path is not None and path.is_file():
+            use_loading_uia = bool(loading_stall_cfg.get("use_uiautomator", True))
+            loading_hit = use_loading_uia and uiautomator_has_markers(adb, loading_stall_markers)
+            overlap = None
+            prev_path = previous_saved_path(writer.paths, exclude=path)
+            if prev_path is not None:
+                prev_sig = signature_from_path(prev_path)
+                curr_sig = signature_from_path(path)
+                if prev_sig is not None and curr_sig is not None:
+                    overlap = similarity(prev_sig, curr_sig)
+            if not loading_hit and bright_band_cfg.get("enabled", True):
+                shot_img = imread_unicode(path)
+                if shot_img is not None and feed_loading_footer_visible(shot_img, bright_band_cfg):
+                    loading_hit = True
+                elif image_has_bright_loading_band(path, bright_band_cfg):
+                    loading_hit = True
+            if loading_hit:
+                if overlap is None or overlap >= overlap_min:
+                    loading_streak += 1
+                else:
+                    loading_streak = 1
+                stop_after_loading = int(loading_stall_cfg.get("stop_after", 3))
+                if loading_streak > 0:
+                    overlap_note = f"{overlap:.3f}" if overlap is not None else "n/a"
+                    print(
+                        f"  scroll {n}: loading stall {loading_streak}/{stop_after_loading} "
+                        f"(overlap={overlap_note})",
+                        flush=True,
+                    )
+                if loading_streak >= stop_after_loading:
+                    print(
+                        f"  scroll: stopped at {n} "
+                        f"(loading stall {loading_streak}x, feed no longer advances)",
+                        flush=True,
+                    )
+                    break
+            else:
+                loading_streak = 0
         if is_dup:
             consecutive_dupes += 1
             if consecutive_dupes >= stop_after_dupes:
@@ -728,6 +1006,8 @@ def capture_scroll_strategy(
                 break
         else:
             consecutive_dupes = 0
+        loading_wait_skips = 0
+        n += 1
 
 
 def capture_horizontal_dates(

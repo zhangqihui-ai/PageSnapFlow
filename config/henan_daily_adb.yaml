@@ -1,0 +1,281 @@
+# 河南日报 ADB scroll capture
+# Package: com.hnzx.hnrb
+# Prerequisite: open app -> 新闻(bottom) -> 精选(top tab)
+
+package: com.hnzx.hnrb
+
+flow_profiles:
+  news_featured_pilot:
+    segments: [news_featured]
+    prefix_map:
+      news_featured: hnrb_news_jx
+
+  news_politics_pilot:
+    segments: [news_politics]
+    prefix_map:
+      news_politics: hnrb_news_sz
+
+  news_henan_pilot:
+    segments: [news_henan]
+    prefix_map:
+      news_henan: hnrb_news_hn
+
+adb_capture:
+  tap_delay_ms: 80
+  post_swipe_delay_ms: 35
+  duplicate_threshold: 0.99
+  skip_duplicate_saves: false
+  content_settle:
+    enabled: true
+    max_wait_ms: 3000
+    poll_ms: 200
+    min_settle_ms: 400
+    max_retries: 2
+    placeholder_std_max: 18
+    placeholder_blue_red_min: 18
+    min_placeholder_rows: 1
+
+# Swipe through title text column (x~58%) — left thumbnails and right headphone icons are tap targets
+feed_swipe:
+  start: "58%, 78%"
+  end: "58%, 22%"
+  duration: 420
+  min_duration: 380
+
+scroll_to_top:
+  start: "58%, 34%"
+  end: "58%, 76%"
+  duration: 420
+  min_duration: 380
+
+# First screenshot only: keep headline text + hero image fully visible below sticky tabs
+first_frame_alignment:
+  enabled: true
+  list_top_ratio: 0.215
+  target_first_text_top_ratio: 0.238
+  top_tolerance_ratio: 0.010
+  scroll_to_top_repeat: 4
+  max_nudge_attempts: 5
+  adjust_wait_ms: 60
+  nudge_swipe:
+    x_ratio: 0.58
+    start_ratio: 0.55
+    min_end_ratio: 0.24
+    max_single_ratio: 0.10
+    duration: 280
+    pass_wait_ms: 40
+
+news_featured_capture:
+  # Full run (~1h): ~900+ frames at ~4s each; cap high enough to reach feed bottom
+  max_scroll_swipes: 10000
+  scroll_stop_after_dupes: 8
+  duplicate_threshold: 0.99
+  scroll_end_uiautomator: false
+  feed_page_guard:
+    enabled: true
+    max_back_attempts: 3
+    recover_back_wait_ms: 450
+    recover_settle_ms: 500
+    recover_nudge_wait_ms: 280
+    recovery_nudge:
+      start: "58%, 70%"
+      end: "58%, 57%"
+      duration: 320
+      min_duration: 300
+  feed_swipe:
+    start: "58%, 78%"
+    end: "58%, 22%"
+    duration: 420
+    min_duration: 380
+    loading_safe_start: "58%, 54%"
+    loading_safe_end: "58%, 22%"
+    loading_safe_duration: 480
+    loading_safe_min_duration: 420
+  scroll_bottom_markers:
+    - "没有更多了"
+    - "暂无更多"
+    - "已经到底"
+    - "到底了"
+    - "没有更多内容"
+    - "已全部加载"
+  scroll_loading_stall:
+    enabled: true
+    use_uiautomator: false
+    stop_after: 3
+    overlap_min_similarity: 0.84
+    markers:
+      - "正在加载"
+      - "加载中"
+    image_detect:
+      enabled: false
+    bright_band_detect:
+      enabled: true
+      top_ratio: 0.82
+      bottom_ratio: 0.905
+      left_ratio: 0.25
+      right_ratio: 0.75
+      mean_min: 240
+      bright_min: 200
+      bright_fill_min: 0.85
+      dark_max: 120
+      dark_fill_min: 0.008
+      dark_fill_max: 0.06
+      # 正在加载... row: bright flat band above bottom nav (no spinner dark pixels)
+      pull_top_ratio: 0.80
+      pull_bottom_ratio: 0.915
+      pull_left_ratio: 0.25
+      pull_right_ratio: 0.75
+      pull_mean_min: 247
+      pull_std_max: 12
+      pull_max_wait_ms: 12000
+      pull_poll_ms: 350
+      pull_clear_streak: 2
+      pull_settle_ms: 450
+      pull_max_wait_skips: 15
+  # Henan Daily does not show a stable 「暂无更多」 footer; image band detect false-stops mid-feed.
+  footer_detect:
+    enabled: false
+
+# 新闻-时政 (top tab 时政). Prerequisite: open app -> 新闻 -> 时政
+news_politics_capture:
+  max_scroll_swipes: 10000
+  scroll_stop_after_dupes: 8
+  duplicate_threshold: 0.99
+  scroll_end_uiautomator: false
+  first_frame_alignment:
+    enabled: false
+  feed_page_guard:
+    enabled: true
+    feed_tab_mode: sticky_tabs
+    max_back_attempts: 3
+    recover_back_wait_ms: 450
+    recover_settle_ms: 500
+    recover_nudge_wait_ms: 280
+    recovery_nudge:
+      start: "58%, 70%"
+      end: "58%, 57%"
+      duration: 320
+      min_duration: 300
+  feed_swipe:
+    start: "58%, 78%"
+    end: "58%, 22%"
+    duration: 420
+    min_duration: 380
+    loading_safe_start: "58%, 54%"
+    loading_safe_end: "58%, 22%"
+    loading_safe_duration: 480
+    loading_safe_min_duration: 420
+  scroll_bottom_markers:
+    - "没有更多了"
+    - "暂无更多"
+    - "已经到底"
+    - "到底了"
+    - "没有更多内容"
+    - "已全部加载"
+  scroll_loading_stall:
+    enabled: true
+    use_uiautomator: false
+    stop_after: 3
+    overlap_min_similarity: 0.84
+    markers:
+      - "正在加载"
+      - "加载中"
+    image_detect:
+      enabled: false
+    bright_band_detect:
+      enabled: true
+      top_ratio: 0.82
+      bottom_ratio: 0.905
+      left_ratio: 0.25
+      right_ratio: 0.75
+      mean_min: 240
+      bright_min: 200
+      bright_fill_min: 0.85
+      dark_max: 120
+      dark_fill_min: 0.008
+      dark_fill_max: 0.06
+      pull_top_ratio: 0.80
+      pull_bottom_ratio: 0.915
+      pull_left_ratio: 0.25
+      pull_right_ratio: 0.75
+      pull_mean_min: 247
+      pull_std_max: 12
+      pull_max_wait_ms: 12000
+      pull_poll_ms: 350
+      pull_clear_streak: 2
+      pull_settle_ms: 450
+      pull_max_wait_skips: 15
+  footer_detect:
+    enabled: false
+
+# 新闻-河南 (top tab 河南). Prerequisite: open app -> 新闻 -> 河南
+news_henan_capture:
+  max_scroll_swipes: 10000
+  scroll_stop_after_dupes: 8
+  duplicate_threshold: 0.99
+  scroll_end_uiautomator: false
+  first_frame_alignment:
+    enabled: false
+  feed_page_guard:
+    enabled: true
+    feed_tab_mode: sticky_tabs
+    max_back_attempts: 3
+    recover_back_wait_ms: 450
+    recover_settle_ms: 500
+    recover_nudge_wait_ms: 280
+    recovery_nudge:
+      start: "58%, 70%"
+      end: "58%, 57%"
+      duration: 320
+      min_duration: 300
+  feed_swipe:
+    start: "58%, 78%"
+    end: "58%, 22%"
+    duration: 420
+    min_duration: 380
+    loading_safe_start: "58%, 54%"
+    loading_safe_end: "58%, 22%"
+    loading_safe_duration: 480
+    loading_safe_min_duration: 420
+  scroll_bottom_markers:
+    - "没有更多了"
+    - "暂无更多"
+    - "已经到底"
+    - "到底了"
+    - "没有更多内容"
+    - "已全部加载"
+  scroll_loading_stall:
+    enabled: true
+    use_uiautomator: false
+    stop_after: 3
+    overlap_min_similarity: 0.84
+    markers:
+      - "正在加载"
+      - "加载中"
+    image_detect:
+      enabled: false
+    bright_band_detect:
+      enabled: true
+      top_ratio: 0.82
+      bottom_ratio: 0.905
+      left_ratio: 0.25
+      right_ratio: 0.75
+      mean_min: 240
+      bright_min: 200
+      bright_fill_min: 0.85
+      dark_max: 120
+      dark_fill_min: 0.008
+      dark_fill_max: 0.06
+      pull_top_ratio: 0.80
+      pull_bottom_ratio: 0.915
+      pull_left_ratio: 0.25
+      pull_right_ratio: 0.75
+      pull_mean_min: 247
+      pull_std_max: 12
+      pull_max_wait_ms: 12000
+      pull_poll_ms: 350
+      pull_clear_streak: 2
+      pull_settle_ms: 450
+      pull_max_wait_skips: 15
+  footer_detect:
+    enabled: false

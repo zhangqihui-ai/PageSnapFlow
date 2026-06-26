@@ -51,3 +51,11 @@ apps:
     package: com.google.android.apps.youtube.unplugged
     flows:
       - home_browse
+
+  henan_daily:
+    display_name: 河南日报
+    package: com.hnzx.hnrb
+    adb_flows:
+      - news_featured_pilot
+      - news_politics_pilot
+      - news_henan_pilot

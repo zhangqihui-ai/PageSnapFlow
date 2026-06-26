@@ -35,6 +35,8 @@ def is_valid_output_name(path: Path) -> bool:
         return True
     if re.match(r"^b\d{2}_t\d{2}_", stem):
         return True
+    if re.match(r"^hnrb_", stem):
+        return True
     if re.match(r"^\d+_(launch|find_games|swipe|ranking|community|home|feed)", stem):
         return True
     if re.match(r"^\d{2}_", stem) and "screenshot" not in stem.lower():
@@ -49,7 +51,7 @@ def name_looks_like_maestro_debug(name: str) -> bool:
 def natural_screenshot_sort_key(path: Path) -> tuple:
     """Order b01_t02_001_overview, b1t1_1, b01_t01_00_start, etc."""
     stem = path.stem
-    numbered = re.match(r"^(b\d{2}_t\d{2}|b1t1)_(\d{3})_(.+)$", stem)
+    numbered = re.match(r"^(b\d{2}_t\d{2}|b1t1|hnrb_[\w]+)_(\d{3})_(.+)$", stem)
     if numbered:
         return (numbered.group(1), int(numbered.group(2)), numbered.group(3))
 
