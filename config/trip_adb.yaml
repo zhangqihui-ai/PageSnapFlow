@@ -11,9 +11,27 @@ package: ctrip.android.view
 
 adb_capture:
   tap_delay_ms: 100
-  post_swipe_delay_ms: 350
+  post_swipe_delay_ms: 500
   duplicate_threshold: 0.94
   skip_duplicate_saves: false
+
+# Wait for waterfall card images to finish loading after each swipe
+content_settle:
+  enabled: true
+  min_settle_ms: 500
+  max_wait_ms: 4500
+  poll_ms: 300
+  feed_top_ratio: 0.185
+  feed_bottom_ratio: 0.895
+  # Two-column masonry: scan card-sized bands in left/right columns
+  columns:
+    - { x1: 0.03, x2: 0.49 }
+    - { x1: 0.51, x2: 0.97 }
+  card_height_ratio: 0.22
+  card_step_ratio: 0.18
+  placeholder_std_max: 18.0
+  placeholder_mean_min: 175.0
+  min_placeholder_cards: 1
 
 # Feed geometry (ratios of screen height)
 feed_top_ratio: 0.185

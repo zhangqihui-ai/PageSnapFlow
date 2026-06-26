@@ -7,9 +7,13 @@ import argparse
 import json
 import re
 import sys
+import tempfile
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
+import cv2
+import numpy as np
 import yaml
 
 _SCRIPT_DIR = Path(__file__).resolve().parent
@@ -17,8 +21,8 @@ _ROOT = _SCRIPT_DIR.parent
 if str(_SCRIPT_DIR) not in sys.path:
     sys.path.insert(0, str(_SCRIPT_DIR))
 
-from adb_taptap_capture import AdbDevice, ShotWriter
-from image_similarity import signature_from_path
+from adb_taptap_capture import AdbDevice, ShotWriter, safe_unlink
+from image_similarity import imread_unicode, signature_from_path
 
 PREFIX = "trip"
 _FILENAME_RE = re.compile(rf"^{PREFIX}_(\d+)_(.+)\.png$")
@@ -44,6 +48,78 @@ def scroll_to_top(adb: AdbDevice, config: dict) -> None:
     repeat = int(spec.get("repeat", 1))
     print(f"  scroll_to_top: {repeat} swipe(s)", flush=True)
     swipe_spec(adb, spec)
+
+
+def content_settle_cfg(config: dict) -> dict:
+    timing = config.get("adb_capture", {})
+    defaults = {
+        "enabled": True,
+        "min_settle_ms": 700,
+        "max_wait_ms": 4500,
+        "poll_ms": 300,
+        "feed_top_ratio": config.get("feed_top_ratio", 0.185),
+        "feed_bottom_ratio": config.get("feed_bottom_ratio", 0.895),
+        "columns": [
+            {"x1": 0.03, "x2": 0.49},
+            {"x1": 0.51, "x2": 0.97},
+        ],
+        "card_height_ratio": 0.22,
+        "card_step_ratio": 0.18,
+        "placeholder_std_max": 18.0,
+        "placeholder_mean_min": 175.0,
+        "min_placeholder_cards": 1,
+    }
+    return {**defaults, **config.get("content_settle", {})}
+
+
+def feed_has_loading_placeholders(img: np.ndarray, cfg: dict) -> bool:
+    h, w = img.shape[:2]
+    top = float(cfg.get("feed_top_ratio", 0.185))
+    bottom = float(cfg.get("feed_bottom_ratio", 0.895))
+    card_h = float(cfg.get("card_height_ratio", 0.22))
+    step = float(cfg.get("card_step_ratio", 0.18))
+    std_max = float(cfg.get("placeholder_std_max", 18.0))
+    mean_min = float(cfg.get("placeholder_mean_min", 175.0))
+    need = int(cfg.get("min_placeholder_cards", 1))
+    hits = 0
+    for col in cfg.get("columns", []):
+        x1 = int(float(col["x1"]) * w)
+        x2 = int(float(col["x2"]) * w)
+        y = top
+        while y + card_h <= bottom:
+            band = img[int(y * h) : int((y + card_h) * h), x1:x2]
+            if band.size == 0:
+                break
+            gray = cv2.cvtColor(band, cv2.COLOR_BGR2GRAY)
+            std = float(gray.std())
+            mean = float(gray.mean())
+            if std <= std_max and mean >= mean_min:
+                hits += 1
+            y += step
+    return hits >= need
+
+
+def wait_for_feed_ready(adb: AdbDevice, cfg: dict) -> None:
+    if not cfg.get("enabled", True):
+        adb.sleep_ms(int(cfg.get("min_settle_ms", 700)))
+        return
+    min_settle = int(cfg.get("min_settle_ms", 700))
+    if min_settle > 0:
+        adb.sleep_ms(min_settle)
+    max_wait_ms = int(cfg.get("max_wait_ms", 4500))
+    poll_ms = int(cfg.get("poll_ms", 300))
+    deadline = time.time() + max_wait_ms / 1000.0
+    while time.time() < deadline:
+        temp = Path(tempfile.gettempdir()) / f"trip_settle_{time.time_ns()}.png"
+        try:
+            adb.screencap(temp)
+            img = imread_unicode(temp)
+            if img is None or not feed_has_loading_placeholders(img, cfg):
+                return
+        finally:
+            safe_unlink(temp)
+        adb.sleep_ms(poll_ms)
+    print("  warning: feed may still be loading placeholders", flush=True)
 
 
 def page_swipe(adb: AdbDevice, config: dict) -> None:
@@ -138,8 +214,9 @@ def run_capture(
         if max_shots is not None
         else full_run.get("max_shots", pilot.get("max_shots", 10))
     )
-    post_swipe_delay_ms = int(timing.get("post_swipe_delay_ms", 350))
+    post_swipe_delay_ms = int(timing.get("post_swipe_delay_ms", 900))
     dup_threshold = float(timing.get("duplicate_threshold", 0.94))
+    settle_cfg = content_settle_cfg(config)
     scroll_first = bool(pilot.get("scroll_to_top_first", True)) and not skip_scroll_to_top
     progress_every = max(1, int(progress_every))
 
@@ -185,7 +262,8 @@ def run_capture(
     feed_bottom = config.get("feed_bottom_ratio", 0.895)
     print(
         f"Trip feed capture: target {target_shots} shots, existing {existing}, "
-        f"screen={adb.size[0]}x{adb.size[1]}, feed={feed_top:.0%}–{feed_bottom:.0%}",
+        f"screen={adb.size[0]}x{adb.size[1]}, feed={feed_top:.0%}–{feed_bottom:.0%}, "
+        f"post_swipe={post_swipe_delay_ms}ms",
         flush=True,
     )
     print(f"Output: {output_dir}", flush=True)
@@ -202,11 +280,12 @@ def run_capture(
         )
     elif scroll_first:
         scroll_to_top(adb, config)
-        adb.sleep_ms(post_swipe_delay_ms)
+        wait_for_feed_ready(adb, settle_cfg)
         writer.capture("00_start")
         existing = len(list_saved_shots(shots_dir))
         print(f"  start capture: {existing}/{target_shots}", flush=True)
     elif existing == 0:
+        wait_for_feed_ready(adb, settle_cfg)
         writer.capture("00_start")
         existing = len(list_saved_shots(shots_dir))
         print(f"  start capture: {existing}/{target_shots}", flush=True)
@@ -214,6 +293,7 @@ def run_capture(
     while existing < target_shots:
         page_swipe(adb, config)
         adb.sleep_ms(post_swipe_delay_ms)
+        wait_for_feed_ready(adb, settle_cfg)
         path, is_dup = writer.capture(f"page_{existing:05d}")
         if is_dup:
             print(f"  warning: frame {existing} looks similar to previous", flush=True)
