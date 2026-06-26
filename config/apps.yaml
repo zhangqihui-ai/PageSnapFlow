@@ -34,6 +34,12 @@ apps:
     flows:
       - home_browse
 
+  trip:
+    display_name: Trip.com
+    package: ctrip.android.view
+    adb_flows:
+      - discovery_feed_pilot
+
   zcool:
     display_name: 站酷
     package: com.zcool.community

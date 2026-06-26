@@ -1,0 +1,44 @@
+# Trip.com / 携程 discovery feed scroll capture (ADB)
+# Prerequisite: open 首页 -> 综合 tab (waterfall feed as in reference screenshot)
+#
+# Layout (1080x2400 reference):
+#   fixed header (search + tabs) ~18%
+#   scrollable two-column feed ~18%–90%
+#   fixed bottom nav ~10%
+# Rule: each step swipes one feed viewport, then captures full screen.
+
+package: ctrip.android.view
+
+adb_capture:
+  tap_delay_ms: 100
+  post_swipe_delay_ms: 350
+  duplicate_threshold: 0.94
+  skip_duplicate_saves: false
+
+# Feed geometry (ratios of screen height)
+feed_top_ratio: 0.185
+feed_bottom_ratio: 0.895
+
+# One-page swipe: finger up through feed center (avoid bottom nav ~90%+)
+page_swipe:
+  start: "50%, 76%"
+  end: "50%, 20%"
+  duration: 340
+
+# Return feed to top before first capture (gentle swipes within feed only)
+scroll_to_top:
+  start: "50%, 32%"
+  end: "50%, 48%"
+  duration: 260
+  repeat: 3
+  wait_ms: 100
+
+pilot:
+  max_shots: 10
+  scroll_to_top_first: false
+
+# Long run: 综合 tab until target count
+full_run:
+  tab_name: 综合
+  max_shots: 5000
+  progress_every: 50
